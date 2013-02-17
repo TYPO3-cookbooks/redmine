@@ -55,6 +55,9 @@ end
 }.each do |gm|
   gem_package gm
 end
+
+bundle_install_dir = "vendor/bundle"
+
 #######################
 # Redmine
 #######################
@@ -72,7 +75,6 @@ git "redmine" do
   user "redmine"
   group "redmine"
   notifies :run, "execute[bundle install]", :immediately
-  notifies :run, "execute[git submodule foreach 'bundle install']", :immediately
   notifies :restart, "service[thin]"
 end
 
@@ -105,21 +107,24 @@ template "/usr/share/redmine/config/database.yml" do
   mode "0664"
 end
 
+template "/usr/share/redmine/Gemfile.lock" do
+  source "redmine/Gemfile.lock"
+  owner "redmine"
+  group "redmine"
+  mode "0664"
+  notifies :run, "execute[bundle install]", :immediately
+end
+
 execute "bundle install" do
-  command "bundle install --binstubs"
+  command "bundle install --binstubs --deployment"
   cwd "/usr/share/redmine"
   user "redmine"
+  only_if { ::File.exists?("/usr/share/redmine/Gemfile.lock") }
   action :nothing
 end
 
-execute "git submodule foreach 'bundle install'" do
-  cwd "/usr/share/redmine"
-  user "redmine"
-  action :nothing 
-end
-
 execute "rake generate_session_store" do
-  command "bundle exec rake generate_session_store"
+  command "/var/lib/gems/1.8/bin/bundle exec rake generate_session_store"
   user "redmine"
   cwd "/usr/share/redmine"
   creates "/usr/share/redmine/config/initializers/session_store.rb"
@@ -127,20 +132,20 @@ execute "rake generate_session_store" do
 end
 
 execute "rake generate_secret_token" do
-  command "bundle exec rake generate_secret_token"
+  command "/var/lib/gems/1.8/bin/bundle exec rake generate_secret_token"
   user "redmine"
   cwd "/usr/share/redmine"
   creates "/usr/share/redmine/config/initializers/secret_token.rb"
   only_if { node['redmine']['branch'] =~ /^2./ }
 end
 
-execute "rake db:migrate" do
-  command "RAILS_ENV=production bundle exec rake db:migrate"
+execute "rake db:migrate:all" do
+  command "bundle exec rake db:migrate:all"
+  environment ({"RAILS_ENV" => "production"})
   user "redmine"
   cwd "/usr/share/redmine"
-  not_if { ::File.exists?("/usr/share/redmine/db/schema.rb") }
+#  action :nothing
 end
-
 
 include_recipe "redmine::thin"
 include_recipe "redmine::nginx"
