@@ -75,7 +75,7 @@ git "redmine" do
   user "redmine"
   group "redmine"
   notifies :run, "execute[bundle install]", :immediately
-  notifies :restart, "service[thin]"
+  notifies :restart, "service[thin-redmine]"
 end
 
 case node['redmine']['database']['type']
