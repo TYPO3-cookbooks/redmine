@@ -27,10 +27,9 @@ end
 
 template "/etc/nginx/conf.d/upstream_thin.conf" do
   source "nginx/upstream_thin.conf"
-  notifies :restart, "service[nginx]"
+  notifies :reload, "service[nginx]"
 end
 
 nginx_site node['redmine']['hostname'] do
   enable true
 end
-
