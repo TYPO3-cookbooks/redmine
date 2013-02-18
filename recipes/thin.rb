@@ -20,16 +20,26 @@
 
 include_recipe "thin"
 
-file "/usr/share/redmine/Gemfile.local" do
-  owner "redmine"
-  group "redmine"
-  content 'gem "thin"'
-  notifies :run, "execute[bundle install]"
+#file "/usr/share/redmine/Gemfile.local" do
+#  owner "redmine"
+#  group "redmine"
+#  content 'gem "thin"'
+#  notifies :run, "execute[bundle install]"
+#end
+
+template "/etc/init.d/thin-redmine" do
+  source "thin/init.d.erb"
+  mode 0755
+end
+
+service "thin-redmine" do
+  supports :status => true, :restart => true, :reload => true
+  action [ :enable, :start ]
 end
 
 template "/etc/thin/redmine.yml" do
   source "thin/redmine.yml"
-  notifies :restart, "service[thin]"
+  notifies :restart, "service[thin-redmine]"
 end
 
 [

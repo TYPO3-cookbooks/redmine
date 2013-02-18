@@ -23,8 +23,6 @@ while pw.length < 20
   pw << OpenSSL::Random.random_bytes(1).gsub(/\W/, '')
 end
 
-default['redmine']['dir'] = "/usr/share/redmine"
-
 default['redmine']['database']['type']     = "mysql"
 default['redmine']['database']['name']     = "redmine"
 default['redmine']['database']['user']     = "redmine"
@@ -36,3 +34,6 @@ default['redmine']['hostname'] = fqdn
 default['redmine']['branch'] = "2.2"
 default['redmine']['source']['repository'] = "git://github.com/redmine/redmine/"
 default['redmine']['source']['reference']  = "master"
+
+default["redmine"]["deploy_to"] = '/usr/local/share/redmine'
+default["redmine"]["path"]      = '/usr/local/share/redmine/current'

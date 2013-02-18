@@ -11,5 +11,5 @@ environment: production
 user: redmine
 servers: 4
 daemonize: true
-chdir: /usr/share/redmine
+chdir: <%= node['redmine']['path'] %>
 socket: /var/run/redmine/sockets/thin.sock

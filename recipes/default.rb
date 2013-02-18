@@ -56,95 +56,100 @@ end
   gem_package gm
 end
 
-bundle_install_dir = "vendor/bundle"
-
 #######################
 # Redmine
 #######################
 
-directory "/usr/share/redmine" do
-  owner "redmine"
-  recursive true
+case node['redmine']['database']['type']
+  when "sqlite"
+    include_recipe "sqlite"
+  when "mysql"
+    include_recipe "mysql::client"
+    include_recipe "redmine::mysql"
 end
 
-git "redmine" do
+
+deploy_revision "redmine" do
   repository node['redmine']['source']['repository']
-  reference node['redmine']['source']['reference']
-  destination "/usr/share/redmine"
+  revision node['redmine']['source']['reference']
+  deploy_to node['redmine']['deploy_to']
   enable_submodules true
   user "redmine"
   group "redmine"
-  notifies :run, "execute[bundle install]", :immediately
-  notifies :restart, "service[thin]"
-end
+  environment "RAILS_ENV" => "production"
+  
+  before_migrate do
+    %w{config log system pids}.each do |dir|
+      directory "#{node['redmine']['deploy_to']}/shared/#{dir}" do
+        owner "redmine"
+        group "redmine"
+        mode '0755'
+        recursive true
+      end
+    end
 
-case node['redmine']['database']['type']
-when "sqlite"
-  include_recipe "sqlite"
-  gem_package "sqlite3-ruby"
-  file "/usr/share/redmine/db/production.db" do
-    owner "redmine"
-    group "redmine"
-    mode "0644"
+    case node['redmine']['database']['type']
+      when "sqlite"
+        gem_package "sqlite3-ruby"
+        file "#{node['redmine']['deploy_to']}/db/production.db" do
+          owner "redmine"
+          group "redmine"
+          mode "0644"
+        end
+    end
+
+    template "#{node['redmine']['deploy_to']}/shared/config/database.yml" do
+      source "redmine/database.yml"
+      owner "redmine"
+      group "redmine"
+      variables :database_server => node['redmine']['database']['hostname']
+      mode "0664"
+    end
+
+    template "#{node['redmine']['deploy_to']}/shared/config/email.yml" do
+      source "redmine/email.yml"
+      owner "redmine"
+      group "redmine"
+      mode "0664"
+    end
+
+    template "#{release_path}/Gemfile.lock" do
+      source "redmine/Gemfile.lock"
+      owner "redmine"
+      group "redmine"
+      mode "0664"
+    end
+
+    execute "bundle install" do
+      command "bundle install --binstubs --deployment --without development test"
+      cwd release_path
+      user "redmine"
+    end
+
+    execute "rake generate_session_store" do
+      command "/var/lib/gems/1.8/bin/bundle exec rake generate_session_store"
+      user "redmine"
+      cwd release_path
+      creates "#{node['redmine']['deploy_to']}/shared/config/initializers/session_store.rb"
+      only_if { node['redmine']['branch'] =~ /^1.4/ }
+      not_if { ::File.exists?("#{release_path}/db/schema.rb") }
+    end
+
+    execute "rake generate_secret_token" do
+      command "/var/lib/gems/1.8/bin/bundle exec rake generate_secret_token"
+      user "redmine"
+      cwd release_path
+      creates "#{node['redmine']['deploy_to']}/shared/config/initializers/secret_token.rb"
+      only_if { node['redmine']['branch'] =~ /^2./ }
+      not_if { ::File.exists?("#{release_path}/db/schema.rb") }
+    end
   end
-when "mysql"
-  include_recipe "mysql::client"
-  include_recipe "redmine::mysql"
-end
 
-template "/usr/share/redmine/config/email.yml" do
-  source "redmine/email.yml"
-  owner "redmine"
-  group "redmine"
-  mode "0664"
-end
+  migrate true
+  migration_command 'bundle exec rake db:migrate:all'
 
-template "/usr/share/redmine/config/database.yml" do
-  source "redmine/database.yml"
-  owner "redmine"
-  group "redmine"
-  variables :database_server => node['redmine']['database']['hostname']
-  mode "0664"
-end
-
-template "/usr/share/redmine/Gemfile.lock" do
-  source "redmine/Gemfile.lock"
-  owner "redmine"
-  group "redmine"
-  mode "0664"
-  notifies :run, "execute[bundle install]", :immediately
-end
-
-execute "bundle install" do
-  command "bundle install --binstubs --deployment"
-  cwd "/usr/share/redmine"
-  user "redmine"
-  only_if { ::File.exists?("/usr/share/redmine/Gemfile.lock") }
-  action :nothing
-end
-
-execute "rake generate_session_store" do
-  command "/var/lib/gems/1.8/bin/bundle exec rake generate_session_store"
-  user "redmine"
-  cwd "/usr/share/redmine"
-  creates "/usr/share/redmine/config/initializers/session_store.rb"
-  only_if { node['redmine']['branch'] =~ /^1.4/ }
-end
-
-execute "rake generate_secret_token" do
-  command "/var/lib/gems/1.8/bin/bundle exec rake generate_secret_token"
-  user "redmine"
-  cwd "/usr/share/redmine"
-  creates "/usr/share/redmine/config/initializers/secret_token.rb"
-  only_if { node['redmine']['branch'] =~ /^2./ }
-end
-
-execute "rake db:migrate:all" do
-  command "bundle exec rake db:migrate:all"
-  environment ({"RAILS_ENV" => "production"})
-  user "redmine"
-  cwd "/usr/share/redmine"
-#  action :nothing
+  action :deploy
+  notifies :restart, "service[thin-redmine]"
 end
 
 include_recipe "redmine::thin"
