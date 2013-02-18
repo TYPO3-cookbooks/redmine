@@ -13,7 +13,7 @@ server {
     error_log /var/log/nginx/error-<%= node.redmine.hostname %>.log;
 
     ## The root of the Debian redmine.
-    root /usr/share/redmine/public;
+    root <%= node['redmine']['dir'] %>/public;
 
     ## Error pages for 404 and 50x.
     error_page 404 404.html;

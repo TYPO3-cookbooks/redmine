@@ -62,7 +62,7 @@ bundle_install_dir = "vendor/bundle"
 # Redmine
 #######################
 
-directory "/usr/share/redmine" do
+directory node['redmine']['dir'] do
   owner "redmine"
   recursive true
 end
@@ -70,7 +70,7 @@ end
 git "redmine" do
   repository node['redmine']['source']['repository']
   reference node['redmine']['source']['reference']
-  destination "/usr/share/redmine"
+  destination node['redmine']['dir']
   enable_submodules true
   user "redmine"
   group "redmine"
@@ -82,7 +82,7 @@ case node['redmine']['database']['type']
 when "sqlite"
   include_recipe "sqlite"
   gem_package "sqlite3-ruby"
-  file "/usr/share/redmine/db/production.db" do
+  file "#{node.redmine.dir}/db/production.db" do
     owner "redmine"
     group "redmine"
     mode "0644"
@@ -92,14 +92,14 @@ when "mysql"
   include_recipe "redmine::mysql"
 end
 
-template "/usr/share/redmine/config/email.yml" do
+template "#{node.redmine.dir}/config/email.yml" do
   source "redmine/email.yml"
   owner "redmine"
   group "redmine"
   mode "0664"
 end
 
-template "/usr/share/redmine/config/database.yml" do
+template "#{node.redmine.dir}/config/database.yml" do
   source "redmine/database.yml"
   owner "redmine"
   group "redmine"
@@ -107,7 +107,7 @@ template "/usr/share/redmine/config/database.yml" do
   mode "0664"
 end
 
-template "/usr/share/redmine/Gemfile.lock" do
+template "#{node.redmine.dir}/Gemfile.lock" do
   source "redmine/Gemfile.lock"
   owner "redmine"
   group "redmine"
@@ -117,25 +117,25 @@ end
 
 execute "bundle install" do
   command "bundle install --binstubs --deployment"
-  cwd "/usr/share/redmine"
+  cwd node['redmine']['dir']
   user "redmine"
-  only_if { ::File.exists?("/usr/share/redmine/Gemfile.lock") }
+  only_if { ::File.exists?("#{node.redmine.dir}/Gemfile.lock") }
   action :nothing
 end
 
 execute "rake generate_session_store" do
   command "/var/lib/gems/1.8/bin/bundle exec rake generate_session_store"
   user "redmine"
-  cwd "/usr/share/redmine"
-  creates "/usr/share/redmine/config/initializers/session_store.rb"
+  cwd node['redmine']['dir']
+  creates "#{node.redmine.dir}/config/initializers/session_store.rb"
   only_if { node['redmine']['branch'] =~ /^1.4/ }
 end
 
 execute "rake generate_secret_token" do
   command "/var/lib/gems/1.8/bin/bundle exec rake generate_secret_token"
   user "redmine"
-  cwd "/usr/share/redmine"
-  creates "/usr/share/redmine/config/initializers/secret_token.rb"
+  cwd node['redmine']['dir']
+  creates "#{node.redmine.dir}/config/initializers/secret_token.rb"
   only_if { node['redmine']['branch'] =~ /^2./ }
 end
 
@@ -143,7 +143,7 @@ execute "rake db:migrate:all" do
   command "bundle exec rake db:migrate:all"
   environment ({"RAILS_ENV" => "production"})
   user "redmine"
-  cwd "/usr/share/redmine"
+  cwd node['redmine']['dir']
 #  action :nothing
 end
 
