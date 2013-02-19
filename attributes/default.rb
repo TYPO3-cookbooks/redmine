@@ -27,7 +27,7 @@ default['redmine']['dir'] = "/usr/share/redmine"
 
 default['redmine']['database']['type']     = "mysql"
 default['redmine']['database']['name']     = "redmine"
-default['redmine']['database']['user']     = "redmine"
+default['redmine']['database']['username'] = "redmine"
 default['redmine']['database']['password'] = pw
 default['redmine']['database']['hostname'] = "localhost"
 
