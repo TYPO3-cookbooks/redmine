@@ -41,10 +41,16 @@ end
 include_recipe "build-essential"
 
 %w{
-libpq-dev
-imagemagick
-libmagick++-dev
-libsqlite3-dev
+  subversion
+}.each do |pkg|
+  package pkg
+end
+
+%w{
+  libpq-dev
+  imagemagick
+  libmagick++-dev
+  libsqlite3-dev
 }.each do |pgk|
   package pgk
 end
