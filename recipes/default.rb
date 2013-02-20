@@ -98,8 +98,8 @@ when "mysql"
   include_recipe "redmine::mysql"
 end
 
-template "#{node.redmine.dir}/config/email.yml" do
-  source "redmine/email.yml"
+template "#{node.redmine.dir}/config/configuration.yml" do
+  source "redmine/configuration.yml"
   owner "redmine"
   group "redmine"
   mode "0664"

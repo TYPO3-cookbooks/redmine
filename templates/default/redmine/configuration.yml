@@ -1,0 +1,4 @@
+# Outgoing email settings
+production:
+  email_delivery:
+    delivery_method: :async_sendmail
