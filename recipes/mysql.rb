@@ -41,6 +41,8 @@ mysql_database "changing the charset of database" do
   sql "ALTER DATABASE #{node['redmine']['database']['name']} charset=latin1"
 end
 
+node.set_unless['redmine']['database']['password'] = secure_password
+
 mysql_database_user node['redmine']['database']['username'] do
   connection mysql_connection_info
   password node['redmine']['database']['password']
