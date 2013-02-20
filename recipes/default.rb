@@ -146,8 +146,7 @@ execute "rake generate_secret_token" do
 end
 
 execute "rake db:migrate:all" do
-  command "bundle exec rake db:migrate:all"
-  environment ({"RAILS_ENV" => "production"})
+  command "bundle exec rake db:migrate:all RAILS_ENV=production"
   user "redmine"
   cwd node['redmine']['dir']
 #  action :nothing
