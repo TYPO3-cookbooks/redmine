@@ -25,14 +25,15 @@ end
 
 default['redmine']['dir'] = "/usr/share/redmine"
 
+default['redmine']['hostname'] = fqdn
+
 default['redmine']['database']['type']     = "mysql"
 default['redmine']['database']['name']     = "redmine"
 default['redmine']['database']['username'] = "redmine"
 default['redmine']['database']['password'] = nil
 default['redmine']['database']['hostname'] = "localhost"
 
-default['redmine']['hostname'] = fqdn
 
 default['redmine']['branch'] = "2.2"
-default['redmine']['source']['repository'] = "git://github.com/redmine/redmine/"
-default['redmine']['source']['reference']  = "master"
+default['redmine']['source']['repository'] = "git://github.com/redmine/redmine.git"
+default['redmine']['source']['reference']  = "2.2-stable"
