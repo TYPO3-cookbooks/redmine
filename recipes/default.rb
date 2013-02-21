@@ -55,18 +55,11 @@ end
   package pgk
 end
 
-#  rake rausgenommen TEST
-%w{
-  bundler
-}.each do |gm|
-  gem_package gm
-end
+gem_package "bundler"
 
-bundle_install_dir = "vendor/bundle"
-
-#######################
-# Redmine
-#######################
+##########################
+# Redmine code deplyoment
+##########################
 
 directory node['redmine']['dir'] do
   owner "redmine"
@@ -84,6 +77,10 @@ git "redmine" do
   notifies :restart, "service[thin-redmine]"
 end
 
+##########################
+# Database
+##########################
+
 case node['redmine']['database']['type']
 when "sqlite"
   include_recipe "sqlite"
@@ -97,6 +94,10 @@ when "mysql"
   include_recipe "mysql::client"
   include_recipe "redmine::mysql"
 end
+
+##########################
+# Redmine configuration
+##########################
 
 template "#{node.redmine.dir}/config/configuration.yml" do
   source "redmine/configuration.yml"
@@ -113,6 +114,11 @@ template "#{node.redmine.dir}/config/database.yml" do
   mode "0664"
 end
 
+##########################
+# Gems, Bundler
+##########################
+
+# ah.. this resource is a bit weird. Maybe it should go into site-forgetypo3org cookbook
 template "#{node.redmine.dir}/Gemfile.lock" do
   source "redmine/Gemfile.lock"
   owner "redmine"
@@ -128,6 +134,10 @@ execute "bundle install" do
   only_if { ::File.exists?("#{node.redmine.dir}/Gemfile.lock") }
   action :nothing
 end
+
+##########################
+# Rake
+##########################
 
 execute "rake generate_session_store" do
   command "/var/lib/gems/1.8/bin/bundle exec rake generate_session_store"
