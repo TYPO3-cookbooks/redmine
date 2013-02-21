@@ -151,11 +151,10 @@ execute "rake db:migrate:all" do
   cwd node['redmine']['dir']
 end
 
+##########################
+# Includes
+##########################
+
 include_recipe "redmine::thin"
 include_recipe "redmine::nginx"
-
-cron "fetch_changesets" do
-  minute "*/30"
-  command "/var/lib/gems/1.8/bin/bundle exec #{node.redmine.dir}/script/runner 'Repository.fetch_changesets' -e production"
-  user "redmine"
-end
+include_recipe "redmine::cron"
