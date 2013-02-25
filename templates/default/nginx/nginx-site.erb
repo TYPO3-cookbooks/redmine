@@ -16,8 +16,8 @@ server {
     root <%= node['redmine']['dir'] %>/public;
 
     ## Error pages for 404 and 50x.
-    error_page 404 404.html;
-    error_page 500 502 503 504 500.html;
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /500.html;
 
 # Shared options used by all proxies
 proxy_set_header        Host $http_host;

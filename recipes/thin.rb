@@ -20,12 +20,12 @@
 
 include_recipe "thin"
 
-file "#{node.redmine.dir}/Gemfile.local" do
-  owner "redmine"
-  group "redmine"
-  content 'gem "thin"'
-  notifies :run, "execute[bundle install]"
-end
+#file "#{node.redmine.dir}/Gemfile.local" do
+#  owner "redmine"
+#  group "redmine"
+#  content 'gem "thin"'
+#  notifies :run, "execute[bundle install]"
+#end
 
 template "/etc/init.d/thin-redmine" do
   source "thin/init.d.erb"
