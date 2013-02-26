@@ -65,6 +65,12 @@ server {
         # proxy_http_version 1.1;
         proxy_set_header Connection '';
         proxy_pass http://redmine_thin;
+
+        # see http://jordanhollinger.com/2011/12/19/deploying-with-thin
+        # Define what a "failure" is, so it can try the next server
+        proxy_next_upstream error timeout http_502 http_503;
+        # If the upstream server doesn't respond within n seconds, timeout
+        proxy_read_timeout 60s;
     }
 
     ## Protect .git files.
