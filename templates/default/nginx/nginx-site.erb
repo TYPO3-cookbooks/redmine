@@ -19,14 +19,14 @@ server {
     error_page 404 /404.html;
     error_page 500 502 503 504 /500.html;
 
-# Shared options used by all proxies
-proxy_set_header        Host $http_host;
+    # Shared options used by all proxies
+    proxy_set_header        Host $http_host;
 
-# Following headers are not used by Redmine but may be useful for plugins and
-# other web applications
-proxy_set_header        X-Real-IP $remote_addr;
-proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-proxy_set_header        X-Forwarded-Proto $scheme;
+    # Following headers are not used by Redmine but may be useful for plugins and
+    # other web applications
+    proxy_set_header        X-Real-IP $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto $scheme;
 
     location / {
         try_files $uri @thin;
