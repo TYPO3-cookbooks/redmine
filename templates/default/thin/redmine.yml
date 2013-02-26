@@ -11,5 +11,6 @@ environment: production
 user: redmine
 servers: 4
 daemonize: true
+onebyone: true
 chdir: /usr/share/redmine
 socket: /var/run/redmine/sockets/thin.sock
