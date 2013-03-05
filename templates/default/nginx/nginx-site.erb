@@ -19,15 +19,6 @@ server {
     error_page 404 /404.html;
     error_page 500 502 503 504 /500.html;
 
-    # Shared options used by all proxies
-    proxy_set_header        Host $http_host;
-
-    # Following headers are not used by Redmine but may be useful for plugins and
-    # other web applications
-    proxy_set_header        X-Real-IP $remote_addr;
-    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header        X-Forwarded-Proto $scheme;
-
     location / {
         try_files $uri @thin;
     }
@@ -63,14 +54,20 @@ server {
     location @thin {
         # not available in nginx 0.7
         # proxy_http_version 1.1;
+
         proxy_set_header Connection '';
-        proxy_pass http://redmine_thin;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
 
         # see http://jordanhollinger.com/2011/12/19/deploying-with-thin
         # Define what a "failure" is, so it can try the next server
         proxy_next_upstream error timeout http_502 http_503;
         # If the upstream server doesn't respond within n seconds, timeout
         proxy_read_timeout 60s;
+
+        proxy_pass http://redmine_thin;
     }
 
     ## Protect .git files.
