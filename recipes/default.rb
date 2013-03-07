@@ -118,13 +118,6 @@ deploy_revision "redmine" do
       mode "0664"
     end
 
-    template "#{release_path}/Gemfile.lock" do
-      source "redmine/Gemfile.lock"
-      owner "redmine"
-      group "redmine"
-      mode "0664"
-    end
-
     execute "bundle install" do
       command "bundle install --binstubs --deployment --without development test"
       cwd release_path
