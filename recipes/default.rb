@@ -146,6 +146,17 @@ deploy_revision "redmine" do
   migrate true
   migration_command 'bundle exec rake db:migrate:all'
 
+  # remove the cached-copy folder caching the git repo, as it more harms than it helps us
+  # reasons:
+  # - does not remove files that were removed from repo
+  # - does not sync submodules
+  after_restart do
+    directory "#{node['redmine']['deploy_to']}/shared/cached-copy" do
+      action :delete
+      recursive true
+    end
+  end
+
   action :deploy
   notifies :restart, "service[thin-redmine]"
 end
