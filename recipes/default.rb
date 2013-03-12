@@ -83,8 +83,19 @@ deploy_revision "redmine" do
   group "redmine"
   environment "RAILS_ENV" => "production"
 
+  symlink_before_migrate "config/database.yml" => "config/database.yml"
+
+  symlinks "system" => "public/system",
+    "pids" => "tmp/pids",
+    "log" => "log",
+    "config/configuration.yml" => "config/configuration.yml",
+    "config/amqp.yml" => "config/amqp.yml",
+    "config/#{secret_token_file}" => "config/initializers/#{secret_token_file}",
+    "files" => "files"
+
+
   before_migrate do
-    %w{config log system pids}.each do |dir|
+    %w{config files log system pids}.each do |dir|
       directory "#{node['redmine']['deploy_to']}/shared/#{dir}" do
         owner "redmine"
         group "redmine"
