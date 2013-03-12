@@ -114,11 +114,16 @@ deploy_revision "redmine" do
         end
     end
 
-    template "#{node['redmine']['deploy_to']}/shared/config/configuration.yml" do
-      source "redmine/configuration.yml"
-      owner "redmine"
-      group "redmine"
-      mode "0664"
+    %w{
+      configuration
+      amqp
+    }.each do |f|
+      template "#{node['redmine']['deploy_to']}/shared/config/#{f}.yml" do
+        source "redmine/#{f}.yml"
+        owner "redmine"
+        group "redmine"
+        mode "0664"
+      end
     end
 
     template "#{node['redmine']['deploy_to']}/shared/config/database.yml" do
