@@ -73,6 +73,20 @@ case node['redmine']['database']['type']
     include_recipe "redmine::mysql"
 end
 
+secret_token_file = node['redmine']['branch'] =~ /^1.4/ ? "session_store.rb" : "secret_token.rb"
+
+if node['redmine']['secret_token_secret'].nil?
+  secret_token_secret = ''
+
+  while secret_token_secret.length < 30
+    secret_token_secret << ::OpenSSL::Random.random_bytes(10).gsub(/\W/, '')
+  end
+
+  node['redmine']['secret_token_secret'].set = secret_token_secret
+else
+  secret_token_secret = node['redmine']['secret_token_secret']
+end
+
 
 deploy_revision "redmine" do
   repository node['redmine']['source']['repository']
@@ -134,29 +148,19 @@ deploy_revision "redmine" do
       mode "0664"
     end
 
+    template "#{node['redmine']['deploy_to']}/shared/config/#{secret_token_file}" do
+      source "redmine/#{secret_token_file}.erb"
+      user "redmine"
+      group "redmine"
+      variables :secret => secret_token_secret
+    end
+
     execute "bundle install" do
       command "bundle install --binstubs --deployment --without development test"
       cwd release_path
       user "redmine"
     end
 
-    execute "rake generate_session_store" do
-      command "/var/lib/gems/1.8/bin/bundle exec rake generate_session_store"
-      user "redmine"
-      cwd release_path
-      creates "#{node['redmine']['deploy_to']}/shared/config/initializers/session_store.rb"
-      only_if { node['redmine']['branch'] =~ /^1.4/ }
-      not_if { ::File.exists?("#{release_path}/db/schema.rb") }
-    end
-
-    execute "rake generate_secret_token" do
-      command "/var/lib/gems/1.8/bin/bundle exec rake generate_secret_token"
-      user "redmine"
-      cwd release_path
-      creates "#{node['redmine']['deploy_to']}/shared/config/initializers/secret_token.rb"
-      only_if { node['redmine']['branch'] =~ /^2./ }
-      not_if { ::File.exists?("#{release_path}/db/schema.rb") }
-    end
   end
 
   migrate true
