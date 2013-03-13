@@ -82,11 +82,48 @@ if node['redmine']['secret_token_secret'].nil?
     secret_token_secret << ::OpenSSL::Random.random_bytes(10).gsub(/\W/, '')
   end
 
-  node['redmine']['secret_token_secret'].set = secret_token_secret
+  node.set['redmine']['secret_token_secret'] = secret_token_secret
+
+  Chef::Log.info "Generated new secret token"
 else
   secret_token_secret = node['redmine']['secret_token_secret']
 end
 
+%w{
+ configuration
+ amqp
+}.each do |f|
+  template "#{node['redmine']['deploy_to']}/shared/config/#{f}.yml" do
+    source "redmine/#{f}.yml"
+    owner "redmine"
+    group "redmine"
+    mode "0664"
+  end
+end
+
+template "#{node['redmine']['deploy_to']}/shared/config/database.yml" do
+  source "redmine/database.yml"
+  owner "redmine"
+  group "redmine"
+  variables :database_server => node['redmine']['database']['hostname']
+  mode "0664"
+end
+
+template "#{node['redmine']['deploy_to']}/shared/config/#{secret_token_file}" do
+  source "redmine/#{secret_token_file}.erb"
+  user "redmine"
+  group "redmine"
+  variables :secret => secret_token_secret
+end
+
+%w{config files log system pids}.each do |dir|
+  directory "#{node['redmine']['deploy_to']}/shared/#{dir}" do
+    owner "redmine"
+    group "redmine"
+    mode '0755'
+    recursive true
+  end
+end
 
 deploy_revision "redmine" do
   repository node['redmine']['source']['repository']
@@ -97,26 +134,18 @@ deploy_revision "redmine" do
   group "redmine"
   environment "RAILS_ENV" => "production"
 
-  symlink_before_migrate "config/database.yml" => "config/database.yml"
+  symlink_before_migrate "config/database.yml" => "config/database.yml",
+                         "config/#{secret_token_file}" => "config/initializers/#{secret_token_file}"
 
   symlinks "system" => "public/system",
     "pids" => "tmp/pids",
     "log" => "log",
     "config/configuration.yml" => "config/configuration.yml",
     "config/amqp.yml" => "config/amqp.yml",
-    "config/#{secret_token_file}" => "config/initializers/#{secret_token_file}",
     "files" => "files"
 
 
   before_migrate do
-    %w{config files log system pids}.each do |dir|
-      directory "#{node['redmine']['deploy_to']}/shared/#{dir}" do
-        owner "redmine"
-        group "redmine"
-        mode '0755'
-        recursive true
-      end
-    end
 
     case node['redmine']['database']['type']
       when "sqlite"
@@ -126,33 +155,6 @@ deploy_revision "redmine" do
           group "redmine"
           mode "0644"
         end
-    end
-
-    %w{
-      configuration
-      amqp
-    }.each do |f|
-      template "#{node['redmine']['deploy_to']}/shared/config/#{f}.yml" do
-        source "redmine/#{f}.yml"
-        owner "redmine"
-        group "redmine"
-        mode "0664"
-      end
-    end
-
-    template "#{node['redmine']['deploy_to']}/shared/config/database.yml" do
-      source "redmine/database.yml"
-      owner "redmine"
-      group "redmine"
-      variables :database_server => node['redmine']['database']['hostname']
-      mode "0664"
-    end
-
-    template "#{node['redmine']['deploy_to']}/shared/config/#{secret_token_file}" do
-      source "redmine/#{secret_token_file}.erb"
-      user "redmine"
-      group "redmine"
-      variables :secret => secret_token_secret
     end
 
     execute "bundle install" do
