@@ -9,7 +9,7 @@ require: []
 max_persistent_conns: 512
 environment: <%= node['redmine']['rails_env'] %>
 user: redmine
-servers: 4
+servers: <%= node['redmine']['thin_servers'] %>
 daemonize: true
 onebyone: true
 chdir: /usr/share/redmine
