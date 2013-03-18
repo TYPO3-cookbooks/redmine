@@ -127,7 +127,7 @@ deploy_revision "redmine" do
   enable_submodules true
   user "redmine"
   group "redmine"
-  environment "RAILS_ENV" => "production"
+  environment "RAILS_ENV" => node['redmine']['rails_env']
 
   symlink_before_migrate "config/database.yml" => "config/database.yml",
                          "config/#{secret_token_file}" => "config/initializers/#{secret_token_file}"

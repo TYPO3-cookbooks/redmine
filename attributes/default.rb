@@ -23,6 +23,8 @@ while pw.length < 20
   pw << OpenSSL::Random.random_bytes(1).gsub(/\W/, '')
 end
 
+default['redmine']['rails_env'] = "production"
+
 default['redmine']['dir'] = "/usr/share/redmine"
 default['redmine']['deploy_to'] = "/usr/local/share/redmine"
 
