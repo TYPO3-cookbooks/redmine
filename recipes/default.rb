@@ -132,6 +132,7 @@ deploy_revision "redmine" do
   symlink_before_migrate "config/database.yml" => "config/database.yml",
                          "config/#{secret_token_file}" => "config/initializers/#{secret_token_file}"
 
+  purge_before_symlink %w{log files}
   symlinks "system" => "public/system",
     "pids" => "tmp/pids",
     "log" => "log",
