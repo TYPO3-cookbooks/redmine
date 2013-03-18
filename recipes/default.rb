@@ -111,7 +111,7 @@ template "#{node['redmine']['deploy_to']}/shared/config/#{secret_token_file}" do
   variables :secret => secret_token_secret
 end
 
-%w{config files log system pids}.each do |dir|
+%w{config files log public/headerimages}.each do |dir|
   directory "#{node['redmine']['deploy_to']}/shared/#{dir}" do
     owner "redmine"
     group "redmine"
@@ -136,7 +136,8 @@ deploy_revision "redmine" do
   symlinks "log" => "log",
     "config/configuration.yml" => "config/configuration.yml",
     "config/amqp.yml" => "config/amqp.yml",
-    "files" => "files"
+    "files" => "files",
+    "public/headerimages" => "public/headerimages"
 
 
   before_migrate do
