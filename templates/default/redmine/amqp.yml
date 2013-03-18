@@ -1,6 +1,0 @@
-amqp:
-  host: srv134.typo3.org
-  port: 5672
-  username: dev.forge.typo3.org
-  password: dev.forge.typo3.org
-  vhost: infrastructure_dev
