@@ -133,12 +133,10 @@ deploy_revision "redmine" do
                          "config/#{secret_token_file}" => "config/initializers/#{secret_token_file}"
 
   purge_before_symlink %w{log files}
-  symlinks "log" => "log",
-    "config/configuration.yml" => "config/configuration.yml",
-    "config/amqp.yml" => "config/amqp.yml",
-    "files" => "files",
-    "public/headerimages" => "public/headerimages"
-
+  symlinks({
+      "log" => "log",
+      "config/configuration.yml" => "config/configuration.yml"
+  }.merge(node['redmine']['deploy']['additional_symlinks']))
 
   before_migrate do
 

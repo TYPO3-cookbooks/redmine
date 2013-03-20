@@ -41,3 +41,5 @@ default['redmine']['database']['hostname'] = "localhost"
 default['redmine']['branch'] = "2.2"
 default['redmine']['source']['repository'] = "git://github.com/redmine/redmine.git"
 default['redmine']['source']['reference']  = "2.2-stable"
+
+default['redmine']['deploy']['additional_symlinks'] = {}
