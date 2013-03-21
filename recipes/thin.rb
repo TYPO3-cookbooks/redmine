@@ -18,14 +18,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include_recipe "thin"
 
-#file "#{node.redmine.dir}/Gemfile.local" do
-#  owner "redmine"
-#  group "redmine"
-#  content 'gem "thin"'
-#  notifies :run, "execute[bundle install]"
-#end
+[
+  "/etc/thin",
+  "/var/log/thin",
+].each do |dir|
+  directory dir
+end
 
 template "/etc/init.d/thin-redmine" do
   source "thin/init.d.erb"
@@ -43,6 +42,7 @@ template "/etc/thin/redmine.yml" do
 end
 
 [
+  "/var/run/thin",
   "/var/run/redmine",
   "/var/run/redmine/sockets"
 ].each do |dir|
