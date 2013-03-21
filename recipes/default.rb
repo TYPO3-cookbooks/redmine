@@ -89,30 +89,15 @@ else
   secret_token_secret = node['redmine']['secret_token_secret']
 end
 
-template "#{node['redmine']['deploy_to']}/shared/config/configuration.yml" do
-  source "redmine/configuration.yml"
-  owner "redmine"
-  group "redmine"
-  mode "0664"
-end
-
-template "#{node['redmine']['deploy_to']}/shared/config/database.yml" do
-  source "redmine/database.yml"
-  owner "redmine"
-  group "redmine"
-  variables :database_server => node['redmine']['database']['hostname']
-  mode "0664"
-end
-
-template "#{node['redmine']['deploy_to']}/shared/config/#{secret_token_file}" do
-  source "redmine/#{secret_token_file}.erb"
-  user "redmine"
-  group "redmine"
-  variables :secret => secret_token_secret
-end
-
-%w{config files log public/headerimages}.each do |dir|
-  directory "#{node['redmine']['deploy_to']}/shared/#{dir}" do
+%w{
+  /
+  /shared/
+  /shared/config/
+  /shared/files/
+  /shared/log/
+  /shared/public/headerimages/
+}.each do |dir|
+  directory "#{node['redmine']['deploy_to']}#{dir}" do
     owner "redmine"
     group "redmine"
     mode '0755'
@@ -139,6 +124,28 @@ deploy_revision "redmine" do
   }.merge(node['redmine']['deploy']['additional_symlinks']))
 
   before_migrate do
+
+    template "#{node['redmine']['deploy_to']}/shared/config/configuration.yml" do
+      source "redmine/configuration.yml"
+      owner "redmine"
+      group "redmine"
+      mode "0664"
+    end
+
+    template "#{node['redmine']['deploy_to']}/shared/config/database.yml" do
+      source "redmine/database.yml"
+      owner "redmine"
+      group "redmine"
+      variables :database_server => node['redmine']['database']['hostname']
+      mode "0664"
+    end
+
+    template "#{node['redmine']['deploy_to']}/shared/config/#{secret_token_file}" do
+      source "redmine/#{secret_token_file}.erb"
+      user "redmine"
+      group "redmine"
+      variables :secret => secret_token_secret
+    end
 
     case node['redmine']['database']['type']
       when "sqlite"
