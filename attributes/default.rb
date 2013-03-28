@@ -43,3 +43,4 @@ default['redmine']['source']['repository'] = "git://github.com/redmine/redmine.g
 default['redmine']['source']['reference']  = "2.2-stable"
 
 default['redmine']['deploy']['additional_symlinks'] = {}
+default['redmine']['deploy']['additional_directories'] = []

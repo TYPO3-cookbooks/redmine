@@ -95,8 +95,7 @@ end
   /shared/config/
   /shared/files/
   /shared/log/
-  /shared/public/headerimages/
-}.each do |dir|
+}.concat(node['redmine']['deploy']['additional_directories']).each do |dir|
   directory "#{node['redmine']['deploy_to']}#{dir}" do
     owner "redmine"
     group "redmine"
