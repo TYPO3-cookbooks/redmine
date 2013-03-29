@@ -89,13 +89,19 @@ else
   secret_token_secret = node['redmine']['secret_token_secret']
 end
 
-%w{
+directories = %w{
   /
-  /shared/
-  /shared/config/
-  /shared/files/
-  /shared/log/
-}.concat(node['redmine']['deploy']['additional_directories']).each do |dir|
+  shared/
+  shared/config/
+  shared/files/
+  shared/log/
+}.concat(node['redmine']['deploy']['additional_directories'])
+
+# ensure that all directories start with a /
+# we need .chr() for ruby 1.8 compatibility
+directories.map!{|dir| (dir[0].chr() == "/" ? dir : "/#{dir}") }
+
+directories.each do |dir|
   directory "#{node['redmine']['deploy_to']}#{dir}" do
     owner "redmine"
     group "redmine"
