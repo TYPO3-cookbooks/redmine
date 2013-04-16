@@ -38,7 +38,6 @@ end
 # Packages
 #######################
 
-include_recipe "build-essential"
 include_recipe "git"
 
 # @todo: support other ruby implementations (jruby, rbenv, ...)
