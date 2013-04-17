@@ -112,7 +112,9 @@ deploy_revision "redmine" do
   # use variable environment (which propably matches the one from chef) ?
   environment "RAILS_ENV" => node['redmine']['rails_env']
 
-  symlink_before_migrate "config/database.yml" => "config/database.yml"
+  symlink_before_migrate({
+      "config/database.yml" => "config/database.yml"
+  })
 
   purge_before_symlink %w{log files}
   symlinks({
