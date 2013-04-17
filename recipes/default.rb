@@ -189,10 +189,6 @@ deploy_revision "redmine" do
   notifies :restart, "service[thin-redmine]"
 end
 
-link node[:redmine][:dir] do
-  to "#{node.redmine.deploy_to}/current"
-end
-
 ##########################
 # Includes
 ##########################

@@ -25,7 +25,7 @@ MySQL is the only tested database. Sqlite could work.
 Attributes
 ==========
 * `node[:redmine][:rails_env]` -  The RAILS ENVIRONMENT used. Defaults to production`.
-* `node[:redmine][:dir]` -  Directory, where the Redmine installation gets deployed to. Defaults to `/usr/share/redmine`.
+* `node[:redmine][:deploy_to]` -  Base directory for Redmine deployement. Defaults to `/usr/share/redmine`
 * `node[:redmine][:hostname]` - Host name of the Redmine server (used as the vhost's server_name). Defaults to `node[:fqdn]`.
 * `node[:redmine][:database][:name]` - Database name. Defaults to `redmine`.
 * `node[:redmine][:database][:username]` - Database user name. Defaults to `redmine`.

@@ -13,7 +13,7 @@
 
 # Do NOT "set -e"
 
-DAEMON=<%= node['redmine']['dir'] %>/bin/thin
+DAEMON=<%= node['redmine']['deploy_to'] %>/current/bin/thin
 SCRIPT_NAME=/etc/init.d/thin-redmine
 CONFIG_PATH=/etc/thin
 
