@@ -124,6 +124,7 @@ deploy_revision "redmine" do
 
   purge_before_symlink %w{log files}
   symlinks({
+      "files" => "files",
       "log" => "log",
       "config/configuration.yml" => "config/configuration.yml"
   }.merge(node['redmine']['deploy']['additional_symlinks']))
