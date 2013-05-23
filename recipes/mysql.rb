@@ -19,9 +19,8 @@
 #
 
 require_recipe "build-essential"
-require_recipe "mysql"
+require_recipe "database::mysql"
 require_recipe "mysql::server"
-require_recipe "database"
 
 mysql_connection_info = {
   :host =>  "localhost",
