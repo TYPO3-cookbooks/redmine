@@ -18,9 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_recipe "build-essential"
-require_recipe "database::mysql"
-require_recipe "mysql::server"
+include_recipe "build-essential"
+include_recipe "mysql::server"
+include_recipe "database::mysql"
 
 mysql_connection_info = {
   :host =>  "localhost",
