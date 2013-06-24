@@ -7,9 +7,9 @@
 #   http://dev.mysql.com/doc/refman/5.0/en/old-client.html
 
 <% case node['redmine']['database']['type'] -%>
-<% when "mysql" -%>
+<% when "mysql", "mysql2" -%>
 production:
-  adapter: mysql2
+  adapter: <%= node['redmine']['database']['type'] %>
   database: <%= node['redmine']['database']['name'] %>
   host: <%= node['redmine']['database']['hostname'] %>
   username: <%= node['redmine']['database']['username'] %>
@@ -17,7 +17,7 @@ production:
   encoding: utf8
 
 development:
-  adapter: mysql2
+  adapter: <%= node['redmine']['database']['type'] %>
   database: <%= node['redmine']['database']['name'] %>
   host: <%= node['redmine']['database']['hostname'] %>
   username: <%= node['redmine']['database']['username'] %>
