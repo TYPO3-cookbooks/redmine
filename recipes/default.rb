@@ -78,21 +78,6 @@ case node['redmine']['database']['type']
     include_recipe "redmine::mysql"
 end
 
-secret_token_file = node['redmine']['branch'] =~ /^1.4/ ? "session_store.rb" : "secret_token.rb"
-
-if node['redmine']['secret_token_secret'].nil?
-  secret_token_secret = ''
-
-  while secret_token_secret.length < 30
-    secret_token_secret << ::OpenSSL::Random.random_bytes(10).gsub(/\W/, '')
-  end
-
-  node.set['redmine']['secret_token_secret'] = secret_token_secret
-
-  Chef::Log.info "Generated new secret token"
-else
-  secret_token_secret = node['redmine']['secret_token_secret']
-end
 
 directories = %w{
   /
@@ -124,8 +109,7 @@ deploy_revision "redmine" do
   group "redmine"
   environment "RAILS_ENV" => node['redmine']['rails_env']
 
-  symlink_before_migrate "config/database.yml" => "config/database.yml",
-                         "config/#{secret_token_file}" => "config/initializers/#{secret_token_file}"
+  symlink_before_migrate "config/database.yml" => "config/database.yml"
 
   purge_before_symlink %w{log files}
   symlinks({
@@ -151,13 +135,6 @@ deploy_revision "redmine" do
       mode "0664"
     end
 
-    template "#{node['redmine']['deploy_to']}/shared/config/#{secret_token_file}" do
-      source "redmine/#{secret_token_file}.erb"
-      user "redmine"
-      group "redmine"
-      variables :secret => secret_token_secret
-    end
-
     case node['redmine']['database']['type']
       when "sqlite"
         gem_package "sqlite3-ruby"
@@ -172,6 +149,21 @@ deploy_revision "redmine" do
       command "bundle install --binstubs --deployment --without development test"
       cwd release_path
       user "redmine"
+    end
+
+    # handle generate_session_store / secret_token
+    # @todo improve way to get redmine version
+    if Gem::Version.new(node['redmine']['source']['reference'].gsub!('/[\D\.]/', '')) < Gem::Version.new('2.0.0')
+    #if Gem::Version.new('1.4') < Gem::Version.new('2.0.0')
+      execute 'bundle exec rake generate_session_store' do
+        cwd release_path
+        not_if { ::File.exists?("#{release_path}/db/schema.rb") }
+      end
+    else
+      execute 'bundle exec rake generate_secret_token' do
+        cwd release_path
+        not_if { ::File.exists?("#{release_path}/config/initializers/secret_token.rb") }
+      end
     end
 
   end
