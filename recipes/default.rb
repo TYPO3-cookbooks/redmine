@@ -2,7 +2,7 @@
 # Cookbook Name:: redmine
 # Recipe:: default
 #
-# Copyright 2012, Steffen Gebert / TYPO3 Association
+# Copyright 2012-2013, Steffen Gebert & Peter Niederlag / TYPO3 Association
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -107,6 +107,7 @@ deploy_revision "redmine" do
   enable_submodules true
   user "redmine"
   group "redmine"
+  # use variable environment (which propably matches the one from chef) ?
   environment "RAILS_ENV" => node['redmine']['rails_env']
 
   symlink_before_migrate "config/database.yml" => "config/database.yml"
