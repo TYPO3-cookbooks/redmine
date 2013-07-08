@@ -120,6 +120,15 @@ deploy_revision "redmine" do
 
   before_migrate do
 
+    # danger on Gemfile.local, it must be in place rather early as otherwise bundler will not detect the dependency
+    # it seems the symlink_before_migrate does only happen after this piece of code is processed
+    template "#{release_path}/Gemfile.local" do
+      source "redmine/Gemfile.local.erb"
+      owner "redmine"
+      group "redmine"
+      mode "0664"
+    end
+
     template "#{node['redmine']['deploy_to']}/shared/config/configuration.yml" do
       source "redmine/configuration.yml"
       owner "redmine"
