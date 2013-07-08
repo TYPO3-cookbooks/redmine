@@ -11,7 +11,15 @@ This cookook uses [Nginx](http://community.opscode.com/cookbooks/nginx) as proxy
 Ruby shit
 ---------
 
-Bundler is installed using the system's package (working at least on Debian Squeeze) into the system's default folder (`/var/lib/gems/1.8/bin` on Debian Squeeze).
+Currently ruby is installed via native package and (default systm ruby) is expected to be >= 1.9.
+An adaption for 1.8 would probably only need to replace adapter mysql2 by mysql in templates/default/redmine/database.yml.
+Support for rbenv, jruby and alike is unknown
+
+Bundler is installed as native system package
+
+Gemfile.local will be injected via a Template and used to add the dependency on thin into bundler (@todo: respect/merge any existing file)
+
+@todo next section needs to be rechecked. Gemfile.lock is problmatic as redmine dynamically adds dependencies from plugins and Gemfile.local
 
 All other Gems are installed through as defined in `Gemfile.lock` (caveat: this file is not contained in the [official Redmine repository](http://github.com/redmine/redmine)). Add this using your own cookbook, see ours as example: [site-forgetypo3org](http://github.com/typo3-cookbooks/site-forgetypo3org). Bundler runs as the Redmine user and installs these Gems into `vendor/gems/` in your Redmine installation.
 
