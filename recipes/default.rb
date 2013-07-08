@@ -154,10 +154,10 @@ deploy_revision "redmine" do
         end
     end
 
-    execute "bundle install" do
-      command "bundle install --binstubs --deployment --without development test"
+    # we just bundle as root without --deployment
+    execute "bundle install --binstubs --without development test" do
+      command "bundle install --binstubs --without development test"
       cwd release_path
-      user "redmine"
     end
 
     # handle generate_session_store / secret_token
