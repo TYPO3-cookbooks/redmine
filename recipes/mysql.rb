@@ -22,8 +22,6 @@ include_recipe "build-essential"
 include_recipe "mysql::server"
 include_recipe "database::mysql"
 
-gem_package "mysql"
-
 mysql_connection_info = {
   :host =>  "localhost",
   :username => "root",
