@@ -173,6 +173,9 @@ deploy_revision "redmine" do
     end
 
     template "#{node['redmine']['deploy_to']}/shared/config/configuration.yml" do
+      if node['redmine']['configuration_cookbook']
+        cookbook node['redmine']['configuration_cookbook']
+      end
       source "redmine/configuration.yml"
       owner "redmine"
       group "redmine"
