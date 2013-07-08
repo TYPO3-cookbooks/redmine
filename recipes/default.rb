@@ -39,14 +39,18 @@ end
 #######################
 
 include_recipe "build-essential"
+include_recipe "git"
 
+# @todo: support other ruby implementations (jruby, rbenv, ...)
 %w{
+  ruby
   subversion
 }.each do |pkg|
   package pkg
 end
 
 %w{
+  ruby-dev
   libpq-dev
   imagemagick
   libmagick++-dev
@@ -55,6 +59,7 @@ end
   package pgk
 end
 
+# only require bundler as everything else is managed by bundler
 gem_package "bundler"
 
 
