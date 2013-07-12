@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "https://boxes.datenbetrieb.de/debian-7-amd64-base.box"
+  config.vm.box_url = "http://boxes.datenbetrieb.de/debian-7-amd64-base.box"
 
   # Assign this VM to a host-only network IP, allowing you to access it
   # via the IP. Host-only networks can talk to the host machine as well as
