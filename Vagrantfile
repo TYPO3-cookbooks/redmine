@@ -81,7 +81,8 @@ Vagrant.configure("2") do |config|
       :mysql => {
         :server_root_password => 'rootpass',
         :server_debian_password => 'debpass',
-        :server_repl_password => 'replpass'
+        :server_repl_password => 'replpass',
+        :bind_address => '127.0.0.1'
       },
       
       :redmine => {
