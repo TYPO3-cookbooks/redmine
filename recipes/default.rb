@@ -192,7 +192,7 @@ deploy_revision "redmine" do
     end
   end
 
-  action :deploy
+  action node['redmine']['force_deploy'] ? :force_deploy : :deploy
   notifies :restart, "service[thin-redmine]"
 end
 

@@ -27,6 +27,7 @@ default['redmine']['rails_env'] = "production"
 default['redmine']['thin_servers'] = "1"
 
 default['redmine']['deploy_to'] = "/srv/redmine"
+default['redmine']['force_deploy'] = false
 
 default['redmine']['hostname'] = fqdn
 
