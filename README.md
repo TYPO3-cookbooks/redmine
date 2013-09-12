@@ -43,5 +43,5 @@ Attributes
 
 * `node[:redmine][:branch]` - Branch of Redmine that is used. Needed e.g. for some `rake` tasks, which changed from 1.x to 2.x. Defaults to `2.2`.
 * `node[:redmine][:source][:repository]` - Git repository. At the moment, you have to use your own fork, as a `Gemfile.lock` is required. Defaults to `git://github.com/redmine/redmine.git`.
-* `node[:redmine][:source][:reference]` - Git reference (branch, tag, commit SHA1) to checkout. Defaults to `2.2-stable`.
+* `node[:redmine][:source][:reference]` - Git reference (branch, tag, commit SHA1) to checkout. Defaults to `2.3-stable`.
 
