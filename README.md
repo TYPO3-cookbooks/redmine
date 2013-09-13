@@ -2,7 +2,7 @@ Description
 ===========
 
 A [Chef](http://opscode.com/chef) cookbook for [Redmine](http://redmine.org) used on [forge.typo3.org](http://forge.typo3.org).
-Tested to be working on debian/wheezy
+Tested to be working on debian/wheezy and redmine > 2.0.0
 
 Used Cookbooks
 --------------
