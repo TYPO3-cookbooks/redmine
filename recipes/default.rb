@@ -147,18 +147,15 @@ deploy_revision "redmine" do
       mode "0664"
     end
 
-    case node['redmine']['database']['type']
-      when "sqlite"
-        gem_package "sqlite3-ruby"
-        file "#{node['redmine']['deploy_to']}/db/production.db" do
-          owner "redmine"
-          group "redmine"
-          mode "0644"
-        end
-    end
+    # chef runs before_migrate, then symlink_before_migrate symlinks, then migrations,
+    # yet our before_migrate needs database.yml to exist (and must complete before
+    # migrations).
+    #
+    # maybe worth doing run_symlinks_before_migrate before before_migrate callbacks,
+    # or an add'l callback.
     # we just bundle as user and "fake" --deployment to gain some more flexibility on existance and state of Gemfile.lock
     execute "bundle install --binstubs --path=vendor/bundle --without development test" do
-      command "bundle install --binstubs --path=vendor/bundle --without development test"
+      command "ln -s ../../../shared/config/database.yml config/database.yml; bundle install --binstubs --path=vendor/bundle --without development test; rm config/database.yml"
       cwd release_path
       environment new_resource.environment
       user "redmine"
