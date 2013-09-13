@@ -155,10 +155,9 @@ deploy_revision "redmine" do
           mode "0644"
         end
     end
-
-    # we just bundle as root without --deployment
-    execute "bundle install --binstubs --without development test" do
-      command "bundle install --binstubs --without development test"
+    # we just bundle as user and "fake" --deployment to gain some more flexibility on existance and state of Gemfile.lock
+    execute "bundle install --binstubs --path=vendor/bundle --without development test" do
+      command "bundle install --binstubs --path=vendor/bundle --without development test"
       cwd release_path
     end
 
