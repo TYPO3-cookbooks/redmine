@@ -36,6 +36,7 @@ MySQL is the only tested database. Sqlite could work.
 Attributes
 ==========
 * `node[:redmine][:rails_env]` -  The RAILS ENVIRONMENT used. Defaults to production`.
+* `node[:redmine][:thin_servers]` -  The number of thin sockets/processes to start, defaults to 1 and most likely needs to be raised
 * `node[:redmine][:deploy_to]` -  Base directory for Redmine deployement. Defaults to `/srv/redmine`
 * `node[:redmine][:force_deploy]` -  boolean to trigger a deployment if the sha1/reference was not updated. only usefull in development. Should not be set in production env. Defaults to false
 * `node[:redmine][:hostname]` - Host name of the Redmine server (used as the vhost's server_name). Defaults to `node[:fqdn]`.
