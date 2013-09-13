@@ -85,7 +85,8 @@ Vagrant.configure("2") do |config|
       },
       
       :redmine => {
-        :reference => "2.3-stable"
+        :reference => "2.3-stable",
+        :force_deploy => false
       }
     }
 
