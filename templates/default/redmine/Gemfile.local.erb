@@ -1,3 +1,13 @@
 # this Gemfile has been created by the redmine default cookbook
 # @todo merge with any Gemfile.lock from source repo if any
 gem "thin"
+# our database.yml will not be present when bundle install is run
+# (due to a problem with symlink_before_migrate)
+# we have to explicitly declare the database dependency in here
+# it has to be similar to the approach in redmine/Gemfile
+<% case node['redmine']['database']['type'] -%>
+<% when "mysql" -%>
+gem "mysql2", "~> 0.3.11", :platforms => [:mri, :mingw]
+<% when "sqlite" -%>
+gem "sqlite3"
+<% end -%>

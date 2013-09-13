@@ -122,7 +122,8 @@ deploy_revision "redmine" do
   before_migrate do
 
     # danger on Gemfile.local, it must be in place rather early as otherwise bundler will not detect the dependency
-    # it seems the symlink_before_migrate does only happen after this piece of code is processed
+    # symlink_before_migrate modifier will only run as part of the migration, files will not be available during before_migrate callback
+    # that's why we have to also include dependency from database.yml in Gemfile.local. Database.yml will not be in place during before_migrat
     template "#{release_path}/Gemfile.local" do
       source "redmine/Gemfile.local.erb"
       owner "redmine"
