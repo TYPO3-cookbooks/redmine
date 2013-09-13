@@ -185,7 +185,8 @@ deploy_revision "redmine" do
   end
 
   migrate true
-  migration_command 'bundle exec rake db:migrate db:migrate_plugins tmp:cache:clear tmp:sessions:clear'
+  # @todo redmine version specific migrate command (?)
+  migration_command 'bundle exec rake db:migrate redmine:plugins:migrate tmp:cache:clear tmp:sessions:clear'
 
   # remove the cached-copy folder caching the git repo, as it more harms than it helps us
   # reasons:
