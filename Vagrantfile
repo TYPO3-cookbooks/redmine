@@ -68,6 +68,8 @@ Vagrant.configure("2") do |config|
   # config.berkshelf.except = []
 
   config.vm.provision :chef_solo do |chef|
+    # inject arguments into chef-solo run(for example set log level to debug)
+    #chef.arguments = '-l debug'
     chef.json = {
       #:redmine => {
       #  :source => {
