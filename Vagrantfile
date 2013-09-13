@@ -83,7 +83,6 @@ Vagrant.configure("2") do |config|
       },
       
       :redmine => {
-        :branch => "2.3-stable",
         :reference => "2.3-stable"
       }
     }

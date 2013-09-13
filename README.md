@@ -2,6 +2,7 @@ Description
 ===========
 
 A [Chef](http://opscode.com/chef) cookbook for [Redmine](http://redmine.org) used on [forge.typo3.org](http://forge.typo3.org).
+Tested to be working on debian/wheezy
 
 Used Cookbooks
 --------------
@@ -11,19 +12,21 @@ This cookook uses [Nginx](http://community.opscode.com/cookbooks/nginx) as proxy
 Ruby shit
 ---------
 
-Currently ruby is installed via native package and (default systm ruby) is expected to be >= 1.9.
-An adaption for 1.8 would probably only need to replace adapter mysql2 by mysql in templates/default/redmine/database.yml.
-Support for rbenv, jruby and alike is unknown
+- ruby is installed via native package and (default systm ruby) is expected to be >= 1.9.1 (1.8 should work but requires mysql gem instead of mysql2)
+- Support for rbenv, jruby and alike is unknown
+- Bundler is installed as native system package
+- Gemfile.local will be injected via a Template and used to add the dependency on thin into bundler as well as to add the database dependencies
+- bundler install will run as user and use --binstub and --path options (quite simialr behaviour to --deployment)
+- binstubs are used by the thin recipe / init script.dd
 
-Bundler is installed as native system package
 
-Gemfile.local will be injected via a Template and used to add the dependency on thin into bundler (@todo: respect/merge any existing file)
+Known Issues
+------------
 
-@todo next section needs to be rechecked. Gemfile.lock is problmatic as redmine dynamically adds dependencies from plugins and Gemfile.local
+common approach for using the chef deploy resource is to use symlink\_before\_migrate for application specific config. The redmine Gemfile does pull in these configs to resolve dependencies. 
+As the bundle install command is run in the before\_migrate callback the corresponding dependencies are *not* in place at the time of the bundler install run. The default recipe solves this by adding
+the proper dependencies for database.yml into the Gemfile.local.erb template
 
-All other Gems are installed through as defined in `Gemfile.lock` (caveat: this file is not contained in the [official Redmine repository](http://github.com/redmine/redmine)). Add this using your own cookbook, see ours as example: [site-forgetypo3org](http://github.com/typo3-cookbooks/site-forgetypo3org). Bundler runs as the Redmine user and installs these Gems into `vendor/gems/` in your Redmine installation.
-
-Binstubs are also created, which care be used by the thin recipe / init script.
 
 Database
 --------
@@ -41,7 +44,6 @@ Attributes
 * `node[:redmine][:database][:password]` - Database user's password. Defaults to `nil`.
 * `node[:redmine][:database][:hostname]` - Database host. Defaults to `localhost`.
 
-* `node[:redmine][:branch]` - Branch of Redmine that is used. Needed e.g. for some `rake` tasks, which changed from 1.x to 2.x. Defaults to `2.2`.
 * `node[:redmine][:source][:repository]` - Git repository. At the moment, you have to use your own fork, as a `Gemfile.lock` is required. Defaults to `git://github.com/redmine/redmine.git`.
 * `node[:redmine][:source][:reference]` - Git reference (branch, tag, commit SHA1) to checkout. Defaults to `2.3-stable`.
 
