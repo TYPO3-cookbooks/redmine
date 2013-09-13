@@ -159,6 +159,8 @@ deploy_revision "redmine" do
     execute "bundle install --binstubs --path=vendor/bundle --without development test" do
       command "bundle install --binstubs --path=vendor/bundle --without development test"
       cwd release_path
+      environment new_resource.environment
+      user "redmine"
     end
 
     # handle generate_session_store / secret_token
@@ -166,12 +168,16 @@ deploy_revision "redmine" do
     if Gem::Version.new(node['redmine']['source']['reference'].gsub!('/[\D\.]/', '')) < Gem::Version.new('2.0.0')
     #if Gem::Version.new('1.4') < Gem::Version.new('2.0.0')
       execute 'bundle exec rake generate_session_store' do
+        environment new_resource.environment
         cwd release_path
+        user "redmine"
         not_if { ::File.exists?("#{release_path}/db/schema.rb") }
       end
     else
       execute 'bundle exec rake generate_secret_token' do
+        environment new_resource.environment
         cwd release_path
+        user "redmine"
         not_if { ::File.exists?("#{release_path}/config/initializers/secret_token.rb") }
       end
     end
