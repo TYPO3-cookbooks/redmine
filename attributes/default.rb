@@ -27,6 +27,7 @@ default['redmine']['rails_env'] = "production"
 default['redmine']['thin_servers'] = "1"
 
 default['redmine']['deploy_to'] = "/srv/redmine"
+default['redmine']['force_deploy'] = false
 
 default['redmine']['hostname'] = fqdn
 
@@ -37,9 +38,8 @@ default['redmine']['database']['password'] = nil
 default['redmine']['database']['hostname'] = "localhost"
 
 
-default['redmine']['branch'] = "2.2"
-default['redmine']['source']['repository'] = "git://github.com/redmine/redmine.git"
-default['redmine']['source']['reference']  = "2.2-stable"
+default['redmine']['source']['repository'] = "https://github.com/redmine/redmine.git"
+default['redmine']['source']['reference']  = "2.3-stable"
 
 default['redmine']['deploy']['additional_symlinks'] = {}
 default['redmine']['deploy']['additional_directories'] = []

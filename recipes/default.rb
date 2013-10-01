@@ -2,7 +2,7 @@
 # Cookbook Name:: redmine
 # Recipe:: default
 #
-# Copyright 2012, Steffen Gebert / TYPO3 Association
+# Copyright 2012-2013, Steffen Gebert & Peter Niederlag / TYPO3 Association
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,14 +39,18 @@ end
 #######################
 
 include_recipe "build-essential"
+include_recipe "git"
 
+# @todo: support other ruby implementations (jruby, rbenv, ...)
 %w{
+  ruby
   subversion
 }.each do |pkg|
   package pkg
 end
 
 %w{
+  ruby-dev
   libpq-dev
   imagemagick
   libmagick++-dev
@@ -55,6 +59,7 @@ end
   package pgk
 end
 
+# only require bundler as everything else is managed by bundler
 gem_package "bundler"
 
 
@@ -73,21 +78,6 @@ case node['redmine']['database']['type']
     include_recipe "redmine::mysql"
 end
 
-secret_token_file = node['redmine']['branch'] =~ /^1.4/ ? "session_store.rb" : "secret_token.rb"
-
-if node['redmine']['secret_token_secret'].nil?
-  secret_token_secret = ''
-
-  while secret_token_secret.length < 30
-    secret_token_secret << ::OpenSSL::Random.random_bytes(10).gsub(/\W/, '')
-  end
-
-  node.set['redmine']['secret_token_secret'] = secret_token_secret
-
-  Chef::Log.info "Generated new secret token"
-else
-  secret_token_secret = node['redmine']['secret_token_secret']
-end
 
 directories = %w{
   /
@@ -117,10 +107,10 @@ deploy_revision "redmine" do
   enable_submodules true
   user "redmine"
   group "redmine"
+  # use variable environment (which propably matches the one from chef) ?
   environment "RAILS_ENV" => node['redmine']['rails_env']
 
-  symlink_before_migrate "config/database.yml" => "config/database.yml",
-                         "config/#{secret_token_file}" => "config/initializers/#{secret_token_file}"
+  symlink_before_migrate "config/database.yml" => "config/database.yml"
 
   purge_before_symlink %w{log files}
   symlinks({
@@ -130,6 +120,17 @@ deploy_revision "redmine" do
   }.merge(node['redmine']['deploy']['additional_symlinks']))
 
   before_migrate do
+
+    # danger on Gemfile.local, it must be in place rather early as otherwise bundler will not detect the dependency
+    # symlink_before_migrate modifier will only run as part of the migration, files will not be available during before_migrate callback
+    # that's why we have to also include dependency from database.yml in Gemfile.local. Database.yml will not be in place during before_migrat
+    template "Gemfile.local" do
+      source "redmine/Gemfile.local.erb"
+      path "#{release_path}/Gemfile.local"
+      owner "redmine"
+      group "redmine"
+      mode "0664"
+    end
 
     template "#{node['redmine']['deploy_to']}/shared/config/configuration.yml" do
       source "redmine/configuration.yml"
@@ -146,33 +147,45 @@ deploy_revision "redmine" do
       mode "0664"
     end
 
-    template "#{node['redmine']['deploy_to']}/shared/config/#{secret_token_file}" do
-      source "redmine/#{secret_token_file}.erb"
-      user "redmine"
-      group "redmine"
-      variables :secret => secret_token_secret
-    end
-
-    case node['redmine']['database']['type']
-      when "sqlite"
-        gem_package "sqlite3-ruby"
-        file "#{node['redmine']['deploy_to']}/db/production.db" do
-          owner "redmine"
-          group "redmine"
-          mode "0644"
-        end
-    end
-
-    execute "bundle install" do
-      command "bundle install --binstubs --deployment --without development test"
+    # chef runs before_migrate, then symlink_before_migrate symlinks, then migrations,
+    # yet our before_migrate needs database.yml to exist (and must complete before
+    # migrations).
+    #
+    # maybe worth doing run_symlinks_before_migrate before before_migrate callbacks,
+    # or an add'l callback.
+    # we just bundle as user and "fake" --deployment to gain some more flexibility on existance and state of Gemfile.lock
+    execute "bundle install --binstubs --path=vendor/bundle --without development test" do
+      command "ln -s ../../../shared/config/database.yml config/database.yml; bundle install --binstubs --path=vendor/bundle --without development test; rm config/database.yml"
       cwd release_path
+      environment new_resource.environment
       user "redmine"
+    end
+
+    # handle generate_session_store / secret_token
+    # @todo improve way to get redmine version
+    if Gem::Version.new(node['redmine']['source']['reference'].gsub!('/[\D\.]/', '')) < Gem::Version.new('2.0.0')
+    #if Gem::Version.new('1.4') < Gem::Version.new('2.0.0')
+      execute 'bundle exec rake generate_session_store' do
+        environment new_resource.environment
+        cwd release_path
+        user "redmine"
+        not_if { ::File.exists?("#{release_path}/db/schema.rb") }
+      end
+    else
+      execute 'bundle exec rake generate_secret_token' do
+        environment new_resource.environment
+        cwd release_path
+        user "redmine"
+        not_if { ::File.exists?("#{release_path}/config/initializers/secret_token.rb") }
+      end
     end
 
   end
 
   migrate true
-  migration_command 'bundle exec rake db:migrate:all'
+  # @todo redmine version specific migrate command (?)
+  #migration_command 'bundle exec rake db:migrate redmine:plugins:migrate tmp:cache:clear tmp:sessions:clear'
+  migration_command 'bundle exec rake db:migrate db:migrate:plugins tmp:cache:clear tmp:sessions:clear'
 
   # remove the cached-copy folder caching the git repo, as it more harms than it helps us
   # reasons:
@@ -185,7 +198,7 @@ deploy_revision "redmine" do
     end
   end
 
-  action :deploy
+  action node['redmine']['force_deploy'] ? :force_deploy : :deploy
   notifies :restart, "service[thin-redmine]"
 end
 
