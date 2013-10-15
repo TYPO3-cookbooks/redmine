@@ -167,8 +167,7 @@ deploy_revision "redmine" do
 
     # handle generate_session_store / secret_token
     # @todo improve way to get redmine version
-    if Gem::Version.new(node['redmine']['source']['reference'].gsub!('/[\D\.]/', '')) < Gem::Version.new('2.0.0')
-    #if Gem::Version.new('1.4') < Gem::Version.new('2.0.0')
+    if Gem::Version.new(node['redmine']['branch']) < Gem::Version.new('2.0.0')
       execute 'bundle exec rake generate_session_store' do
         environment new_resource.environment
         cwd release_path
