@@ -172,7 +172,7 @@ deploy_revision "redmine" do
         environment new_resource.environment
         cwd release_path
         user "redmine"
-        not_if { ::File.exists?("#{release_path}/db/schema.rb") }
+        not_if { ::File.exists?("#{release_path}/config/initializers/session_store.rb") }
       end
     else
       execute 'bundle exec rake generate_secret_token' do
