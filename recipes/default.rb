@@ -112,8 +112,11 @@ deploy_revision "redmine" do
   # use variable environment (which propably matches the one from chef) ?
   environment "RAILS_ENV" => node['redmine']['rails_env']
 
+  secret_token_file = Gem::Version.new(node['redmine']['branch']) < Gem::Version.new('2.0.0') ? 'session_store.rb' : 'secret_token.rb'
+
   symlink_before_migrate({
-      "config/database.yml" => "config/database.yml"
+      "config/database.yml" => "config/database.yml",
+      "config/#{secret_token_file}" => "config/initializers/#{secret_token_file}"
   })
 
   purge_before_symlink %w{log files}
@@ -126,13 +129,16 @@ deploy_revision "redmine" do
   before_migrate do
 
     # Chef runs before_migrate, then symlink_before_migrate, then migrations,
-    # yet our before_migrate needs database.yml to exist (and must complete before migrations).
+    # yet our before_migrate needs database.yml and secret_token.rb to exist
+    # (and must complete before migrations).
 
     execute "symlink_before_before_migrate" do
       # This is a workaround for the problem mentioned above:
       # - add database.yml symlink manually
+      # - copy the secret_token_file from shared/config/ and ignore if it's missing (it will be created by generate_secret_token in this case)
       command <<-EOH
         ln -s ../../../shared/config/database.yml config/database.yml
+        cp -a ../../../shared/config/#{secret_token_file} config/initializers/#{secret_token_file} || true
       EOH
       cwd release_path
       environment new_resource.environment
@@ -190,12 +196,17 @@ deploy_revision "redmine" do
       end
     end
 
-    #execute "symlink_after_before_migrate" do
-    # This is currently not needed
-    #  cwd release_path
-    #  environment new_resource.environment
-    #  user "redmine"
-    #end
+    execute "symlink_after_before_migrate" do
+      # This is part 2 of an ugly workaround, see symlink_before_before_migrate:
+      # - copy the secret_token_file back to shared/config/
+      # - database.yml and secret_token_file will be overwritten by symlink_before_migrate, so a further cleanup is not needed
+      command <<-EOH
+        cp -a config/initializers/#{secret_token_file} #{node['redmine']['deploy_to']}/shared/config/#{secret_token_file}
+      EOH
+      cwd release_path
+      environment new_resource.environment
+      user "redmine"
+    end
   end
 
   migrate true
