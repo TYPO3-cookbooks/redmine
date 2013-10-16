@@ -43,6 +43,7 @@ include_recipe "git"
 # @todo: support other ruby implementations (jruby, rbenv, ...)
 %w{
   ruby
+  rubygems
   subversion
 }.each do |pkg|
   package pkg
@@ -59,7 +60,9 @@ end
 end
 
 # only require bundler as everything else is managed by bundler
-gem_package "bundler"
+gem_package "bundler" do
+  options("--bindir /usr/local/bin --no-ri --no-rdoc")
+end
 
 
 
