@@ -125,6 +125,20 @@ deploy_revision "redmine" do
 
   before_migrate do
 
+    # Chef runs before_migrate, then symlink_before_migrate, then migrations,
+    # yet our before_migrate needs database.yml to exist (and must complete before migrations).
+
+    execute "symlink_before_before_migrate" do
+      # This is a workaround for the problem mentioned above:
+      # - add database.yml symlink manually
+      command <<-EOH
+        ln -s ../../../shared/config/database.yml config/database.yml
+      EOH
+      cwd release_path
+      environment new_resource.environment
+      user "redmine"
+    end
+
     # danger on Gemfile.local, it must be in place rather early as otherwise bundler will not detect the dependency
     # symlink_before_migrate modifier will only run as part of the migration, files will not be available during before_migrate callback
     # that's why we have to also include dependency from database.yml in Gemfile.local. Database.yml will not be in place during before_migrat
@@ -151,15 +165,8 @@ deploy_revision "redmine" do
       mode "0664"
     end
 
-    # chef runs before_migrate, then symlink_before_migrate symlinks, then migrations,
-    # yet our before_migrate needs database.yml to exist (and must complete before
-    # migrations).
-    #
-    # maybe worth doing run_symlinks_before_migrate before before_migrate callbacks,
-    # or an add'l callback.
     # we just bundle as user and "fake" --deployment to gain some more flexibility on existance and state of Gemfile.lock
     execute "bundle install --binstubs --path=vendor/bundle --without development test" do
-      command "ln -s ../../../shared/config/database.yml config/database.yml; bundle install --binstubs --path=vendor/bundle --without development test; rm config/database.yml"
       cwd release_path
       environment new_resource.environment
       user "redmine"
@@ -183,6 +190,12 @@ deploy_revision "redmine" do
       end
     end
 
+    #execute "symlink_after_before_migrate" do
+    # This is currently not needed
+    #  cwd release_path
+    #  environment new_resource.environment
+    #  user "redmine"
+    #end
   end
 
   migrate true
