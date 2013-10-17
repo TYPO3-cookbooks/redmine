@@ -228,7 +228,7 @@ deploy_revision "redmine" do
   migrate true
 
   if Gem::Version.new(redmine_release) < Gem::Version.new('2.0.0')
-    migration_command 'bundle exec rake db:migrate db:migrate:upgrade_plugin_migrations db:migrate:plugins tmp:cache:clear tmp:sessions:clear'
+    migration_command 'bundle exec rake db:migrate db:migrate:plugins tmp:cache:clear tmp:sessions:clear'
   else
     migration_command 'bundle exec rake db:migrate redmine:plugins:migrate tmp:cache:clear tmp:sessions:clear'
   end
