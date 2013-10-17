@@ -43,5 +43,8 @@ default['redmine']['database']['hostname'] = "localhost"
 default['redmine']['source']['repository'] = "https://github.com/redmine/redmine.git"
 default['redmine']['source']['reference']  = "2.3-stable"
 
+# By default, the release is read from the Git reference name. It can be specified manually if needed:
+#default['redmine']['release'] = "2.3"
+
 default['redmine']['deploy']['additional_symlinks'] = {}
 default['redmine']['deploy']['additional_directories'] = []

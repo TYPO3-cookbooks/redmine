@@ -80,6 +80,14 @@ case node['redmine']['database']['type']
     include_recipe "redmine::mysql"
 end
 
+if node['redmine']['release'].nil?
+  redmine_release = node['redmine']['source']['reference'].gsub(/[^\d\.].*/, '')
+  if redmine_release.nil?
+    Chef::Log.fatal("Could not detect the redmine release. Specify it in node['redmine']['release'].")
+  end
+else
+  redmine_release = node['redmine']['release']
+end
 
 directories = %w{
   /
@@ -112,7 +120,7 @@ deploy_revision "redmine" do
   # use variable environment (which propably matches the one from chef) ?
   environment "RAILS_ENV" => node['redmine']['rails_env']
 
-  secret_token_file = Gem::Version.new(node['redmine']['branch']) < Gem::Version.new('2.0.0') ? 'session_store.rb' : 'secret_token.rb'
+  secret_token_file = Gem::Version.new(redmine_release) < Gem::Version.new('2.0.0') ? 'session_store.rb' : 'secret_token.rb'
 
   symlink_before_migrate({
       "config/database.yml" => "config/database.yml",
@@ -180,7 +188,7 @@ deploy_revision "redmine" do
 
     # handle generate_session_store / secret_token
     # @todo improve way to get redmine version
-    if Gem::Version.new(node['redmine']['branch']) < Gem::Version.new('2.0.0')
+    if Gem::Version.new(redmine_release) < Gem::Version.new('2.0.0')
       execute 'bundle exec rake generate_session_store' do
         environment new_resource.environment
         cwd release_path
@@ -211,7 +219,7 @@ deploy_revision "redmine" do
 
   migrate true
 
-  if Gem::Version.new(node['redmine']['branch']) < Gem::Version.new('2.0.0')
+  if Gem::Version.new(redmine_release) < Gem::Version.new('2.0.0')
     migration_command 'bundle exec rake db:migrate db:migrate:upgrade_plugin_migrations db:migrate:plugins tmp:cache:clear tmp:sessions:clear'
   else
     migration_command 'bundle exec rake db:migrate redmine:plugins:migrate tmp:cache:clear tmp:sessions:clear'
