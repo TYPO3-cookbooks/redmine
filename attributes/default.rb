@@ -26,6 +26,13 @@ end
 default['redmine']['rails_env'] = "production"
 default['redmine']['thin_servers'] = "1"
 
+# Run the fetch_changesets cronjob every 30 minutes
+# (set this attribute to false to disable the job completely)
+default['redmine']['cron_fetch_changesets'] = {
+  'hour'   => '*',
+  'minute' => '*/30'
+}
+
 default['redmine']['deploy_to'] = "/srv/redmine"
 default['redmine']['force_deploy'] = false
 
