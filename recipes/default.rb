@@ -60,7 +60,9 @@ end
 end
 
 # only require bundler as everything else is managed by bundler
-gem_package "bundler"
+gem_package "bundler" do
+  options("--no-ri --no-rdoc")
+end
 
 
 
