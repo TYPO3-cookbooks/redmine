@@ -38,7 +38,9 @@ default['redmine']['force_deploy'] = false
 
 default['redmine']['hostname'] = fqdn
 
-default['redmine']['database']['type']     = "mysql"
+# The database type needs to be changed manually depending on the Ruby version:
+# 1.8 = mysql / 1.9+ = mysql2
+default['redmine']['database']['type']     = "mysql2"
 default['redmine']['database']['name']     = "redmine"
 default['redmine']['database']['username'] = "redmine"
 default['redmine']['database']['password'] = nil
