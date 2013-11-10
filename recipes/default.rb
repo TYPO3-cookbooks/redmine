@@ -73,11 +73,19 @@ gem_package "bundler"
 case node['redmine']['database']['type']
   when "sqlite"
     include_recipe "sqlite"
-  when "mysql"
+  when "mysql", "mysql2"
     include_recipe "mysql::client"
     include_recipe "redmine::mysql"
 end
 
+if node['redmine']['release'].nil?
+  redmine_release = node['redmine']['source']['reference'].gsub(/[^\d\.].*/, '')
+  if redmine_release.nil?
+    Chef::Log.fatal("Could not detect the redmine release. Specify it in node['redmine']['release'].")
+  end
+else
+  redmine_release = node['redmine']['release']
+end
 
 directories = %w{
   /
@@ -171,8 +179,7 @@ deploy_revision "redmine" do
 
     # handle generate_session_store / secret_token
     # @todo improve way to get redmine version
-    if Gem::Version.new(node['redmine']['source']['reference'].gsub!('/[\D\.]/', '')) < Gem::Version.new('2.0.0')
-    #if Gem::Version.new('1.4') < Gem::Version.new('2.0.0')
+    if Gem::Version.new(redmine_release) < Gem::Version.new('2.0.0')
       execute 'bundle exec rake generate_session_store' do
         environment new_resource.environment
         cwd release_path
@@ -191,10 +198,11 @@ deploy_revision "redmine" do
   end
 
   migrate true
-  # @todo redmine version specific migrate command (?)
-  #migration_command 'bundle exec rake db:migrate redmine:plugins:migrate tmp:cache:clear tmp:sessions:clear'
-  migration_command 'bundle exec rake db:migrate db:migrate:plugins tmp:cache:clear tmp:sessions:clear'
 
+  if Gem::Version.new(redmine_release) < Gem::Version.new('2.0.0')
+    migration_command 'bundle exec rake db:migrate db:migrate:plugins tmp:cache:clear tmp:sessions:clear'
+  else
+    migration_command 'bundle exec rake db:migrate redmine:plugins:migrate tmp:cache:clear tmp:sessions:clear'
   end
 
   action node['redmine']['force_deploy'] ? :force_deploy : :deploy

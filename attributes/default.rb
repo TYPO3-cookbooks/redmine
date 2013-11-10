@@ -48,6 +48,9 @@ default['redmine']['database']['hostname'] = "localhost"
 default['redmine']['source']['repository'] = "https://github.com/redmine/redmine.git"
 default['redmine']['source']['reference']  = "2.3-stable"
 
+# By default, the release is read from the Git reference name. It can be specified manually if needed:
+#default['redmine']['release'] = "2.3"
+
 # Remove the cached-copy folder caching the Git repo, as it more harms than it helps us.
 # Reasons:
 # - does not remove files that were removed from repo
