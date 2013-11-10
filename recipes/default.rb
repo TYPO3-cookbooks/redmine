@@ -126,7 +126,12 @@ deploy_revision "redmine" do
   # use variable environment (which propably matches the one from chef) ?
   environment "RAILS_ENV" => node['redmine']['rails_env']
 
-  symlink_before_migrate "config/database.yml" => "config/database.yml"
+  secret_token_file = Gem::Version.new(redmine_release) < Gem::Version.new('2.0.0') ? 'session_store.rb' : 'secret_token.rb'
+
+  symlink_before_migrate({
+      "config/database.yml" => "config/database.yml",
+      "config/#{secret_token_file}" => "config/initializers/#{secret_token_file}"
+  })
 
   purge_before_symlink %w{log files}
   symlinks({
@@ -184,7 +189,7 @@ deploy_revision "redmine" do
         environment new_resource.environment
         cwd release_path
         user "redmine"
-        not_if { ::File.exists?("#{release_path}/db/schema.rb") }
+        not_if { ::File.exists?("#{release_path}/config/initializers/session_store.rb") }
       end
     else
       execute 'bundle exec rake generate_secret_token' do
@@ -195,6 +200,17 @@ deploy_revision "redmine" do
       end
     end
 
+    execute "symlink_after_before_migrate" do
+      # This is part 2 of an ugly workaround, see symlink_before_before_migrate:
+      # - copy the secret_token_file back to shared/config/
+      # - database.yml and secret_token_file will be overwritten by symlink_before_migrate, so a further cleanup is not needed
+      command <<-EOH
+        cp -a config/initializers/#{secret_token_file} #{node['redmine']['deploy_to']}/shared/config/#{secret_token_file}
+      EOH
+      cwd release_path
+      environment new_resource.environment
+      user "redmine"
+    end
   end
 
   migrate true
