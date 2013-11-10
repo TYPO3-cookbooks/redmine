@@ -100,6 +100,14 @@ directories.each do |dir|
   end
 end
 
+if node['redmine']['clear_cached_copy']
+  directory "#{node['redmine']['deploy_to']}/shared/cached-copy" do
+    action :delete
+    recursive true
+    only_if { ::File.exists?("#{node['redmine']['deploy_to']}/shared/cached-copy") }
+  end
+end
+
 deploy_revision "redmine" do
   repository node['redmine']['source']['repository']
   revision node['redmine']['source']['reference']
@@ -187,15 +195,6 @@ deploy_revision "redmine" do
   #migration_command 'bundle exec rake db:migrate redmine:plugins:migrate tmp:cache:clear tmp:sessions:clear'
   migration_command 'bundle exec rake db:migrate db:migrate:plugins tmp:cache:clear tmp:sessions:clear'
 
-  # remove the cached-copy folder caching the git repo, as it more harms than it helps us
-  # reasons:
-  # - does not remove files that were removed from repo
-  # - does not sync submodules
-  after_restart do
-    directory "#{node['redmine']['deploy_to']}/shared/cached-copy" do
-      action :delete
-      recursive true
-    end
   end
 
   action node['redmine']['force_deploy'] ? :force_deploy : :deploy

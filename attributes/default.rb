@@ -48,5 +48,11 @@ default['redmine']['database']['hostname'] = "localhost"
 default['redmine']['source']['repository'] = "https://github.com/redmine/redmine.git"
 default['redmine']['source']['reference']  = "2.3-stable"
 
+# Remove the cached-copy folder caching the Git repo, as it more harms than it helps us.
+# Reasons:
+# - does not remove files that were removed from repo
+# - does not sync submodules
+default['redmine']['clear_cached_copy'] = true
+
 default['redmine']['deploy']['additional_symlinks'] = {}
 default['redmine']['deploy']['additional_directories'] = []
