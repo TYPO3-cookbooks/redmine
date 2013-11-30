@@ -61,3 +61,5 @@ default['redmine']['clear_cached_copy'] = true
 
 default['redmine']['deploy']['additional_symlinks'] = {}
 default['redmine']['deploy']['additional_directories'] = []
+
+override['nginx']['default_site_enabled'] = false
