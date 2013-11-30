@@ -19,7 +19,7 @@
 #
 
 include_recipe "nginx"
-	
+
 template "/etc/nginx/sites-available/#{node['redmine']['hostname']}" do
   source "nginx/nginx-site.erb"
   notifies :reload, "service[nginx]"
