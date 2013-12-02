@@ -29,14 +29,9 @@ mysql_connection_info = {
 
 mysql_database node['redmine']['database']['name'] do
 connection mysql_connection_info
+  encoding node['redmine']['database']['encoding']
+  collation node['redmine']['database']['collation']
   action :create
-end
-
-mysql_database "changing the charset of database" do
-  connection mysql_connection_info
-  database_name node['redmine']['database']['name']
-  action :query
-  sql "ALTER DATABASE #{node['redmine']['database']['name']} charset=latin1"
 end
 
 node.set_unless['redmine']['database']['password'] = secure_password

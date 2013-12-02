@@ -45,6 +45,8 @@ default['redmine']['database']['name']     = "redmine"
 default['redmine']['database']['username'] = "redmine"
 default['redmine']['database']['password'] = nil
 default['redmine']['database']['hostname'] = "localhost"
+default['redmine']['database']['encoding'] = "utf8"
+default['redmine']['database']['collation'] = "utf8_general_ci"
 
 
 default['redmine']['source']['repository'] = "https://github.com/redmine/redmine.git"
