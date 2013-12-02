@@ -44,7 +44,7 @@ Attributes
 * `node[:redmine][:database][:username]` - Database user name. Defaults to `redmine`.
 * `node[:redmine][:database][:password]` - Database user's password. Defaults to `nil`.
 * `node[:redmine][:database][:hostname]` - Database host. Defaults to `localhost`.
-* `node[:redmine][:database][:ecoding]` - Database encoding. Defaults to `utf8`.
+* `node[:redmine][:database][:encoding]` - Database encoding. Defaults to `utf8`.
 * `node[:redmine][:database][:collation]` - Database collation. Defaults to `utf8_general_ci`.
 
 * `node[:redmine][:source][:repository]` - Git repository. At the moment, you have to use your own fork, as a `Gemfile.lock` is required. Defaults to `git://github.com/redmine/redmine.git`.
