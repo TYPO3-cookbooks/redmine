@@ -153,7 +153,7 @@ deploy_revision "redmine" do
       # - add database.yml symlink manually
       # - copy the secret_token_file from shared/config/ and ignore if it's missing (it will be created by generate_secret_token in this case)
       command <<-EOH
-        ln -s ../../shared/config/database.yml config/database.yml
+        ln -s ../../../shared/config/database.yml config/database.yml
         cp -a ../../shared/config/#{secret_token_file} config/initializers/#{secret_token_file} || true
       EOH
       cwd release_path
