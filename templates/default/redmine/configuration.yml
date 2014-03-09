@@ -2,3 +2,6 @@
 production:
   email_delivery:
     delivery_method: :async_sendmail
+development:
+  email_delivery:
+    delivery_method: :test
