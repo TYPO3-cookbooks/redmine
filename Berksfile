@@ -1,5 +1,3 @@
-site :opscode
-
-cookbook "git"
+source "https://api.berkshelf.com"
 
 metadata
