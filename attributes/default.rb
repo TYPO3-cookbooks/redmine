@@ -65,3 +65,6 @@ default['redmine']['deploy']['additional_symlinks'] = {}
 default['redmine']['deploy']['additional_directories'] = []
 
 override['nginx']['default_site_enabled'] = false
+
+# as chef_gem mysql requires make, we need that already in the compile phase
+default['build-essential']['compile_time'] = false
