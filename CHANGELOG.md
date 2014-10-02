@@ -3,7 +3,6 @@ Redmine Cookbook CHANGELOG
 This file is used to list changes made in each version of the Redmine cookbook.
 
 
-v0.4.0
+v0.2.0
 -------
-### API
-- drop support for branch attribute, use reference instead
+- logration for redmine log files (via logrotate cookbook/definition)
