@@ -76,7 +76,10 @@ case node['redmine']['database']['type']
   when "sqlite"
     include_recipe "sqlite"
   when "mysql", "mysql2"
-    include_recipe "mysql::client"
+    #include_recipe "mysql::client"
+    mysql_client 'default' do
+          action :create
+    end
     include_recipe "redmine::mysql"
 end
 

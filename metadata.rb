@@ -9,5 +9,6 @@ version          "0.1.5"
 depends "build-essential", "~> 2.0.4"
 depends "nginx"
 depends "database"
-depends "mysql"
+depends "mysql", '~> 6.0'
 depends "git"
+depends 'mysql2_chef_gem', '~> 1.0.2'

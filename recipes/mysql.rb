@@ -19,8 +19,19 @@
 #
 
 include_recipe "build-essential"
-include_recipe "mysql::server"
-include_recipe "database::mysql"
+#include_recipe "mysql::server"
+#include_recipe "database::mysql"
+
+# include the #secure_password method
+Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
+
+mysql2_chef_gem 'default' do
+  action :install
+end
+
+mysql_service 'default' do
+  action [:create, :start]
+end
 
 mysql_connection_info = {
   :host =>  "localhost",
