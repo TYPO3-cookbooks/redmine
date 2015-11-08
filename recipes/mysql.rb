@@ -29,18 +29,30 @@ mysql2_chef_gem 'default' do
   action :install
 end
 
-mysql_service 'default' do
+# Disable the default MySQL service
+# Needed due to the bug https://github.com/chef-cookbooks/mysql/issues/378
+case node["platform_family"]
+when "debian"
+  service "mysql" do
+    action [ :disable, :stop ]
+  end
+end
+
+mysql_service 'redmine' do
+  #server_debian_password  node['mysql']['server_root_password']
+  initial_root_password  node['mysql']['server_root_password']
   action [:create, :start]
 end
 
 mysql_connection_info = {
   :host =>  "localhost",
   :username => "root",
-  :password => node['mysql']['server_root_password']
+  :password => node['mysql']['server_root_password'],
+  :socket => "/run/mysql-redmine/mysqld-sock"
 }
 
 mysql_database node['redmine']['database']['name'] do
-connection mysql_connection_info
+  connection mysql_connection_info
   encoding node['redmine']['database']['encoding']
   collation node['redmine']['database']['collation']
   action :create
