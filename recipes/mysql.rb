@@ -77,8 +77,9 @@ mysql_database_user node['redmine']['database']['username'] do
   action :grant
 end
 
-mysql_database "flushing mysql privileges" do
+mysql_database 'flush mysql privileges' do
   connection mysql_connection_info
-  action :query
-  sql "FLUSH PRIVILEGES"
+  database_name 'mysql'
+  sql        'FLUSH PRIVILEGES'
+  action     :query
 end
