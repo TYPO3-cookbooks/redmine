@@ -13,6 +13,17 @@ Deployment Architecture
 * mysql or sqlite as database (sqlite currently untested) 
 * Redmine sources/release can be adapted via custom git ressource or release tage
 
+Testing/Development
+------------------------
+
+Make sure you have [Chefdk](https://downloads.chef.io/chef-dk/),[Vagrant](https://www.vagrantup.com/) and [Virtualbox](https://www.virtualbox.org/) installed and running on your box. (vmware support?)
+
+Copy the file `.kitchen.local.example.yml` to `.kitchen.local.yml` and adjust the IP to match your local environment.
+
+Use `kitchen converge` to provision a debian based vagrant box.
+
+Redmine should be available on the IP that you set in `.kitchen.local.yml` 
+
 Cookbook Dependencies
 -----------------------
 
