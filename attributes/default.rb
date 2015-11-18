@@ -45,6 +45,7 @@ default['redmine']['database']['name']     = "redmine"
 default['redmine']['database']['username'] = "redmine"
 default['redmine']['database']['password'] = nil
 default['redmine']['database']['hostname'] = "localhost"
+default['redmine']['database']['socket'] = "/var/run/mysql-redmine/mysqld.sock"
 default['redmine']['database']['encoding'] = "utf8"
 default['redmine']['database']['collation'] = "utf8_general_ci"
 

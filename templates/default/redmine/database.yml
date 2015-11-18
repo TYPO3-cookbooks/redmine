@@ -12,6 +12,7 @@ production:
   adapter: <%= node['redmine']['database']['type'] %>
   database: <%= node['redmine']['database']['name'] %>
   host: <%= node['redmine']['database']['hostname'] %>
+  socket: <%= node['redmine']['database']['socket'] %>
   username: <%= node['redmine']['database']['username'] %>
   password: <%= node['redmine']['database']['password'] %>
   encoding: utf8

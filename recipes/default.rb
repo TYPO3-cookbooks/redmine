@@ -186,7 +186,7 @@ deploy_revision "redmine" do
       source "redmine/database.yml"
       owner "redmine"
       group "redmine"
-      variables :database_server => node['redmine']['database']['hostname']
+      variables :database_server => node['redmine']['database']['hostname'], :socket => node['redmine']['database']['socket']
       mode "0664"
     end
 

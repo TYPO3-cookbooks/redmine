@@ -41,16 +41,16 @@ end
 mysql_service 'redmine' do
   #server_debian_password  node['mysql']['server_root_password']
   bind_address '::ffff:127.0.0.1'
-  socket "/run/mysql-redmine/mysqld-sock"
   initial_root_password  node['mysql']['server_root_password']
+  socket node['redmine']['database']['socket']
   action [:create, :start]
 end
 
 mysql_connection_info = {
   :host =>  "localhost",
   :username => "root",
-  :password => node['mysql']['server_root_password'],
-  :socket => "/run/mysql-redmine/mysqld-sock"
+  :socket => node['redmine']['database']['socket'],
+  :password => node['mysql']['server_root_password']
 }
 
 mysql_database node['redmine']['database']['name'] do

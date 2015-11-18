@@ -17,4 +17,5 @@ suites:
       server_root_password: linux4evr
     redmine:
       database:
+        username: redmine
         password: notforproduction
