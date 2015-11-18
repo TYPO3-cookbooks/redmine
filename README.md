@@ -1,16 +1,31 @@
 Description
 ===========
 
-A [Chef](http://opscode.com/chef) cookbook for [Redmine](http://redmine.org) used on [forge.typo3.org](http://forge.typo3.org).
-Tested to be working on debian/wheezy and redmine > 2.0.0
+A [Chef](http://opscode.com/chef) cookbook for [Redmine](http://redmine.org) developed by the TYPO3 infrastructure team. The cookbook is intended to provide a generic approach for installing redmine via chef. The cookbook is in production use on our [forge.typo3.org](http://forge.typo3.org) instance (Internal Note: it's wrapped by additional typo3.org specific cookbooks for sso, messaging-services and more).
 
-Used Cookbooks
---------------
+Tested to be working on debian/jessie and redmine > 3.x, while it should work for redmine 2.x as well. We are generally willing to accept patches for additional platform support if someone does provide these.
 
-This cookook uses [Nginx](http://community.opscode.com/cookbooks/nginx) as proxy and [Thin](http://github.com/typo3-cookbooks/thin) as Ruby application server. 
+Deployment Architecture
+------------------------
+
+* Nginx as reverse proxy
+* Thin as ruby application server running redmine rails application
+* mysql or sqlite as database (sqlite currently untested) 
+* Redmine sources/release can be adapted via custom git ressource or release tage
+
+Cookbook Dependencies
+-----------------------
+
+The following dependencies are pulled in via metadata.rb:
+
+* [Nginx](http://community.opscode.com/cookbooks/nginx) as proxy
+* [Thin](http://github.com/typo3-cookbooks/thin) as Ruby application server. 
+* [Database](https://github.com/chef-cookbooks/database)
+* [mysql](https://github.com/chef-cookbooks/mysql) ~> 6.0
+* [mysql2_chef_gem](https://github.com/sinfomicien/mysql2_chef_gem)
 
 Ruby shit
----------
+------------
 
 - ruby is installed via native package and (default systm ruby) is expected to be >= 1.9.1 (1.8 should work but requires mysql gem instead of mysql2)
 - Support for rbenv, jruby and alike is unknown
@@ -44,6 +59,7 @@ Attributes
 * `node[:redmine][:database][:username]` - Database user name. Defaults to `redmine`.
 * `node[:redmine][:database][:password]` - Database user's password. Defaults to `nil`.
 * `node[:redmine][:database][:hostname]` - Database host. Defaults to `localhost`.
+* `node[:redmine][:database][:socket]` - Database socket. Defaults to `/var/run/mysql-redmine/mysqld.sock`.
 * `node[:redmine][:database][:encoding]` - Database encoding. Defaults to `utf8`.
 * `node[:redmine][:database][:collation]` - Database collation. Defaults to `utf8_general_ci`.
 
