@@ -35,6 +35,7 @@ connection mysql_connection_info
   action :create
 end
 
+Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 node.set_unless['redmine']['database']['password'] = secure_password
 
 mysql_database_user node['redmine']['database']['username'] do
