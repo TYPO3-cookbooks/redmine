@@ -43,8 +43,7 @@ end
 
 [
   "/var/run/thin",
-  "/var/run/redmine",
-  "/var/run/redmine/sockets"
+  "/var/run/redmine"
 ].each do |dir|
   directory dir do
     user "redmine"

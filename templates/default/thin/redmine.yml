@@ -13,4 +13,4 @@ servers: <%= node['redmine']['thin_servers'] %>
 daemonize: true
 onebyone: true
 chdir: <%= node['redmine']['deploy_to'] %>/current
-socket: /var/run/redmine/sockets/thin.sock
+socket: /var/run/redmine/thin.sock
