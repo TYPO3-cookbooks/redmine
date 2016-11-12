@@ -18,9 +18,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include_recipe "build-essential"
+include_recipe "mysql::client"
 include_recipe "mysql::server"
-include_recipe "database::mysql"
+
+## Otherwise the chef_gem[mysql] fails to install
+include_recipe "chef-sugar::default"
+
+at_compile_time do
+  build_essential 'install_packages'
+  package 'libmysqlclient-dev'
+end
+
+chef_gem "mysql2"
 
 mysql_connection_info = {
   :host =>  "localhost",
@@ -55,6 +64,7 @@ end
 
 mysql_database "flushing mysql privileges" do
   connection mysql_connection_info
+  database_name 'mysql'
   action :query
   sql "FLUSH PRIVILEGES"
 end
