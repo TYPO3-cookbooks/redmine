@@ -224,12 +224,7 @@ deploy_revision "redmine" do
   end
 
   migrate true
-
-  if Gem::Version.new(redmine_release) < Gem::Version.new('2.0.0')
-    migration_command 'bundle exec rake db:migrate db:migrate:plugins tmp:cache:clear tmp:sessions:clear'
-  else
-    migration_command 'bundle exec rake db:migrate redmine:plugins:migrate redmine:plugins:assets tmp:cache:clear tmp:sessions:clear'
-  end
+  migration_command 'bundle exec rake db:migrate redmine:plugins:migrate redmine:plugins:assets tmp:cache:clear tmp:sessions:clear'
 
   action node['redmine']['force_deploy'] ? :force_deploy : :deploy
   notifies :restart, "service[thin-redmine]"
