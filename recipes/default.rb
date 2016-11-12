@@ -65,6 +65,16 @@ gem_package "bundler" do
 end
 
 
+# Set bundle config to allow nokogiri to install
+directory "/home/redmine/.bundle/" do
+  owner "redmine"
+end
+
+file "/home/redmine/.bundle/config" do
+  content "---\nBUNDLE_BUILD__NOKOGIRI: \"--use-system-libraries\""
+  owner "redmine"
+  group "redmine"
+end
 
 
 
