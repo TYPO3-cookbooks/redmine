@@ -64,6 +64,7 @@ end
 
 mysql_database "flushing mysql privileges" do
   connection mysql_connection_info
+  database_name 'mysql'
   action :query
   sql "FLUSH PRIVILEGES"
 end
