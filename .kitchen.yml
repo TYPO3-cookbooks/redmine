@@ -1,14 +1,18 @@
+---
 driver:
   name: vagrant
+
+verifier:
+  name: inspec
 
 provisioner:
   name: chef_zero
 
 platforms:
-- name: debian-8.6
+  - name: debian-8.5
 
 suites:
-- name: default
-  run_list:
-    - recipe[redmine::default]
-  attributes: {}
+  - name: default
+    run_list:
+      - recipe[redmine::default]
+    attributes: {}
