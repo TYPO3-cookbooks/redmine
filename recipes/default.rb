@@ -193,6 +193,7 @@ deploy_revision "redmine" do
       group "redmine"
       variables :database_server => node['redmine']['database']['hostname']
       mode "0664"
+      sensitive true
     end
 
     # we just bundle as user and "fake" --deployment to gain some more flexibility on existance and state of Gemfile.lock
