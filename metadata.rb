@@ -8,7 +8,6 @@ version          "0.3.4"
 
 depends "build-essential"
 depends "nginx",            "~> 2.8.0"
-depends "ohai",             ">= 4.0.0"
 depends "php",              "= 1.1.2"
 
 depends "git"
