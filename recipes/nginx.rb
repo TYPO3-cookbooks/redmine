@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include_recipe "nginx"
+include_recipe "chef_nginx"
 
 template "/etc/nginx/sites-available/#{node['redmine']['hostname']}" do
   source "nginx/nginx-site.erb"

@@ -7,7 +7,8 @@ long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          IO.read(File.join(File.dirname(__FILE__), 'VERSION')) rescue '0.0.1'
 
 depends "build-essential"
-depends "nginx",            "~> 2.8.0"
+depends "chef_nginx",       "< 6.0.0" # 6.0 requires Chef 12.7 at least
+# php uses a modified version of the upstream cookbook, right?
 depends "php",              "= 1.1.2"
 
 depends "git"
@@ -19,3 +20,6 @@ depends "chef-sugar"
 depends "t3-mysql",         "~> 5.1.0"
 #depends "database"
 #depends "mysql"
+
+# For compatibility with Chef 12.5.1
+depends "ohai",         "< 5.0.0"
