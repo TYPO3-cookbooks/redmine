@@ -29,11 +29,7 @@ end
 template "/etc/init.d/thin-redmine" do
   source "thin/init.d.erb"
   mode 0755
-end
-
-service "thin-redmine" do
-  supports :status => true, :restart => true, :reload => true
-  action [ :enable, :start ]
+  notifies :restart, "service[thin-redmine]"
 end
 
 template "/etc/thin/redmine.yml" do
@@ -42,8 +38,8 @@ template "/etc/thin/redmine.yml" do
 end
 
 [
-  "/var/run/thin",
-  "/var/run/redmine"
+"/var/run/thin",
+"/var/run/redmine"
 ].each do |dir|
   directory dir do
     user "redmine"
@@ -52,3 +48,16 @@ end
   end
 end
 
+service "thin-redmine" do
+  supports :status => true, :restart => true, :reload => true
+  action [ :enable, :start ]
+  # finish the chef run only after service is available
+  notifies :run, 'ruby_block[wait_until_ready]'
+end
+
+ruby_block "wait_until_ready" do
+  block do
+    wait_until_ready!
+  end
+  action :nothing
+end
