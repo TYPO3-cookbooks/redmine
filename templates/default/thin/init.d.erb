@@ -20,14 +20,24 @@ CONFIG_PATH=/etc/thin
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
 
+check_run_dir() {
+	if [ ! -d /var/run/thin ]; then
+		mkdir /var/run/thin
+	fi
+	chown redmine:redmine /var/run/thin
+	chmod 0755 /var/run/thin
+}
+
 case "$1" in
   start)
+	check_run_dir
 	$DAEMON start --all $CONFIG_PATH
 	;;
   stop)
 	$DAEMON stop --all $CONFIG_PATH
 	;;
   restart|force-reload|reload)
+	check_run_dir
 	$DAEMON restart --all $CONFIG_PATH
 	;;
   *)
@@ -35,5 +45,8 @@ case "$1" in
 	exit 3
 	;;
 esac
+
+
+
 
 :

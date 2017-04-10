@@ -37,17 +37,6 @@ template "/etc/thin/redmine.yml" do
   notifies :restart, "service[thin-redmine]"
 end
 
-[
-"/var/run/thin",
-"/var/run/redmine"
-].each do |dir|
-  directory dir do
-    user "redmine"
-    group "redmine"
-    recursive true
-  end
-end
-
 service "thin-redmine" do
   supports :status => true, :restart => true, :reload => true
   action [ :enable, :start ]
