@@ -8,6 +8,7 @@ cron 'fetch_changesets' do
   end
 
   path '/usr/local/bin:/usr/bin:/bin'
-  command "BUNDLE_GEMFILE=#{node['redmine']['deploy_to']}/current/Gemfile RAILS_ENV=production bundle exec rake -f #{node['redmine']['deploy_to']}/current/Rakefile redmine:fetch_changesets"
+  # Mute this task. We don't want to hear about errors (just ignore them)
+  command "BUNDLE_GEMFILE=#{node['redmine']['deploy_to']}/current/Gemfile RAILS_ENV=production bundle exec rake -f #{node['redmine']['deploy_to']}/current/Rakefile redmine:fetch_changesets >/dev/null 2>&1"
   user 'redmine'
 end
