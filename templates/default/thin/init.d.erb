@@ -25,7 +25,7 @@ check_run_dir() {
 		mkdir /var/run/thin
 	fi
 	chown redmine:redmine /var/run/thin
-	chmod 0755 /var/run/thin
+	chmod 0750 /var/run/thin
 }
 
 case "$1" in
