@@ -235,7 +235,7 @@ end
 # Includes
 ##########################
 
-include_recipe "redmine::thin"
 include_recipe "redmine::nginx"
+include_recipe "redmine::thin"
 include_recipe "redmine::cron"
 include_recipe "redmine::logrotate"
