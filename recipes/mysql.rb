@@ -18,8 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include_recipe "mysql::client"
-include_recipe "mysql::server"
+include_recipe "t3-mysql::backup"
+include_recipe "t3-mysql::server"
 
 ## Otherwise the chef_gem[mysql] fails to install
 include_recipe "chef-sugar::default"
